@@ -6,9 +6,16 @@
 		<title>戰力計算器</title>
 		<style>
 			body {
-				width: 400px;
+				max-width: 400px;
+				width: 100%;
 				margin: auto;
 				gap: 5px;
+			}
+			
+			@media screen and (orientation: portrait) {
+				body {
+					max-width: none;
+				}
 			}
 			
 			.hint {
@@ -606,7 +613,7 @@
 			}
 			
 			let jsonData = {};
-			const dataUrl = "https://evertale-playertw.github.io/mytest/InfoForPowerCalc.json";
+			const dataUrl = "InfoForPowerCalc.json";
 			
 			function loadSelectableData() {
 				fetch(dataUrl)
