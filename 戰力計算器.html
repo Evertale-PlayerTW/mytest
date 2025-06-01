@@ -160,7 +160,7 @@
 		</div>
 		
 		<select id="targetSelect" onchange="fillInfo()">
-			<option value="">▼▼ 選擇對象以自動帶入參數，或手動填入數值 ▼▼</option>
+			<option value="">▼ 選擇對象以自動帶入參數，或手動填入數值 ▼</option>
 		</select>
 		
 		<div>
@@ -631,7 +631,7 @@
 			
 			function setSelectableList() {
 				const targetSelect = document.getElementById("targetSelect");
-				targetSelect.innerHTML = '<option value="">▼▼ 選擇對象以自動帶入參數，或手動填入數值▼▼</option>';
+				targetSelect.innerHTML = '<option value="">▼ 選擇對象以自動帶入參數，或手動填入數值 ▼</option>';
 				
 				const selectedRarities = Array.from(document.querySelectorAll('#filterRarity input:checked')).map(cb => cb.value);
 				const selectedElements = Array.from(document.querySelectorAll('#filterElement input:checked')).map(cb => cb.value);
