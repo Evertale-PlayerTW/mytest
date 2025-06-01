@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+	
+	<head>
+		<meta charset="UTF-8">
+		<title>戰力計算器</title>
+		<style>
+			body {
+				width: 400px;
+				margin: auto;
+				gap: 5px;
+			}
+			
+			.hint {
+				font-size: 0.7em;
+			}
+			
+			input[type="number"] {
+				/*text-align: right; */
+			}
+			
+			.outputStat input[type="text"] {
+				text-align: right;
+			}
+			
+			.inputStat label,
+			.outputStat label {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+			}
+			
+			label input {
+				flex: 1;
+				min-width: 0;
+				margin-left: 10px;
+			}
+			
+			.chooseOption {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				padding: 3px 0;
+			}
+			
+			.chooseOption label {
+				flex: 1;
+				text-align: center;
+			}
+			
+			#filterRarity,
+			#filterElement,
+			#filterWeaponType {
+				border: 1px solid black;
+				margin: 5px 0;
+				padding: 10px;
+			}
+			
+			#targetSelect {
+				width: 100%;
+				margin: 10px auto;
+				font-size: 1em;
+			}
+			
+			div:has(button) {
+				text-align: center;
+			}
+			
+			/* Chrome, Safari, Edge */
+			input[type="number"]::-webkit-outer-spin-button,
+			input[type="number"]::-webkit-inner-spin-button {
+				-webkit-appearance: none;
+				margin: 0;
+			}
+			
+			/* Firefox */
+			input[type="number"] {
+				-moz-appearance: textfield;
+			}
+			
+			select {
+				/* 隱藏 <select> 預設的箭頭樣式 */
+				appearance: none;
+				/* For modern browsers */
+				-webkit-appearance: none;
+				/* For Safari and Chrome */
+				-moz-appearance: none;
+				/* For Firefox */
+				text-align: center;
+				text-align-last: center;
+			}
+			
+			option:first-child {
+				text-align: center;
+			}
+			
+			option:not(:first-child) {
+				text-align: left;
+			}
+			
+			button {
+				margin: 2px auto;
+			}
+		</style>
+	</head>
+	
+	<body>
+		
+		<div class="chooseOption" id="selectCategory">
+			<label><input type="radio" name="unit_category" value="Monster" onchange="changeCategory()" checked>角色</label>
+			<label><input type="radio" name="unit_category" value="Weapon" onchange="changeCategory()">武器</label>
+			<label><input type="radio" name="unit_category" value="Equipment" onchange="changeCategory()">飾品</label>
+		</div>
+		
+		<div id="filterRarity" onclick="toggleAllCheckboxes(event)">
+			
+			<div class="chooseOption">
+				<label><input type="checkbox" value="N" onchange="setSelectableList()" checked>N</label>
+				<label><input type="checkbox" value="R" onchange="setSelectableList()" checked>R</label>
+				<label><input type="checkbox" value="SR" onchange="setSelectableList()" checked>SR</label>
+				<label><input type="checkbox" value="SSR" onchange="setSelectableList()" checked>SSR</label>
+			</div>
+		</div>
+		
+		<div id="filterElement" class="mo" onclick="toggleAllCheckboxes(event)">
+			<div class="chooseOption">
+				<label><input type="checkbox" value="Fire" onchange="setSelectableList()" checked>火</label>
+				<label><input type="checkbox" value="Water" onchange="setSelectableList()" checked>水</label>
+				<label><input type="checkbox" value="Earth" onchange="setSelectableList()" checked>地</label>
+				<label><input type="checkbox" value="Air" onchange="setSelectableList()" checked>雷</label>
+				<label><input type="checkbox" value="Life" onchange="setSelectableList()" checked>光</label>
+				<label><input type="checkbox" value="Death" onchange="setSelectableList()" checked>闇</label>
+			</div>
+		</div>
+		
+		<div id="filterWeaponType" class="wo" style="display: none;" onclick="toggleAllCheckboxes(event)">
+			<div class="chooseOption" id="filterWeaponTypeYellow">
+				<label><input type="checkbox" value="Sword" onchange="setSelectableList()" checked>單手劍</label>
+				<label><input type="checkbox" value="Axe" onchange="setSelectableList()" checked>單手斧</label>
+				<label><input type="checkbox" value="Staff" onchange="setSelectableList()" checked>法杖</label>
+				<label><input type="checkbox" value="Mace" onchange="setSelectableList()" checked>釘頭鎚</label>
+			</div>
+			
+			<div class="chooseOption" id="filterWeaponTypeRed">
+				<label><input type="checkbox" value="GreatSword" onchange="setSelectableList()" checked>雙手劍</label>
+				<label><input type="checkbox" value="GreatAxe" onchange="setSelectableList()" checked>雙手斧</label>
+				<label><input type="checkbox" value="Spear" onchange="setSelectableList()" checked>長槍</label>
+				<label><input type="checkbox" value="Hammer" onchange="setSelectableList()" checked>大槌</label>
+				<label><input type="checkbox" value="Katana" onchange="setSelectableList()" checked>武士刀</label>
+			</div>
+		</div>
+		
+		<select id="targetSelect" onchange="fillInfo()">
+			<option value="">▼▼ 選擇對象以自動帶入參數，或手動填入數值 ▼▼</option>
+		</select>
+		
+		<div>
+			<hr>
+		</div>
+		<div class="inputStat ms ws">
+			<label id="baseAtkLabel">基礎攻擊力<span class="hint">(正整數)</span>：<input type="number" id="base_atk" value="1" step="1"></label>
+		</div>
+		<div class="inputStat ms ws">
+			<label id="baseHpLabel">基礎生命<span class="hint">(正整數)</span>：<input type="number" id="base_hp" value="1" step="1"></label>
+		</div>
+		<div class="inputStat es" style="display: none;">
+			<label id="atkLabel">攻擊力<span class="hint">(整數)</span>：<input type="number" id="atk" value="1" step="1"></label>
+		</div>
+		<div class="inputStat es" style="display: none;">
+			<label id="hpLabel">生命<span class="hint">(整數)</span>：<input type="number" id="hp" value="1" step="1"></label>
+		</div>
+		<div class="inputStat es" style="display: none;">
+			<label>速度<span class="hint">(正整數)</span>：<input type="number" id="speed" value="1" step="1"></label>
+		</div>
+		<div class="inputStat ms ws">
+			<label>星數<span class="hint">(整數0~6)</span>：<input type="number" id="stars" value="0" min="0" max="6" step="1"></label>
+		</div>
+		<div class="inputStat ms ws">
+			<label>最大星數<span class="hint">(整數0~6)</span>：<input type="number" id="max_star" value="0" min="0" max="6" step="1"></label>
+		</div>
+		<div class="inputStat ms ws">
+			<label>等級<span class="hint">(整數1~200)</span>：<input type="number" id="level" value="1" min="1" max="200" step="1"></label>
+		</div>
+		<div class="inputStat ms ws">
+			<label>突破<span class="hint">(不含進化(升星)之次數。整數0~5)</span>：<input type="number" id="limit_break" value="0" min="0" max="5" step="1"></label>
+		</div>
+		<div class="inputStat ms ws">
+			<label>覺醒<span class="hint">(整數0~4)</span>：<input type="number" id="awakening" value="0" min="0" max="4" step="1"></label>
+		</div>
+		<div class="inputStat ms ws">
+			<label>增幅<span class="hint">(整數0~300)</span>：<input type="number" id="boost" value="0" min="0" max="300" step="1"></label>
+		</div>
+		<div class="inputStat ms ws">
+			<label>潛能<span class="hint">(整數0~10000)</span>：<input type="number" id="potential" value="0" min="0" max="10000" step="1"></label>
+		</div>
+		<div class="inputStat ms">
+			<label>昇華<span class="hint">(整數0~40)</span>：<input type="number" id="mastery" value="0" min="0" max="40" step="1"></label>
+		</div>
+		<div class="inputStat ms">
+			<label>已超越：<input type="checkbox" id="ascended"></label>
+		</div>
+		
+		<div><br></div>
+		<div>
+			<button onclick="maxStat()">一鍵最大強化</button>
+		</div>
+		<div>
+			<button onclick="calcPower()">計算戰力</button>
+		</div>
+		
+		<div>
+			<hr>
+		</div>
+		<div class="outputStat ms ws">
+			<label>攻擊力：<input type="text" id="result_atk" readonly></label>
+		</div>
+		<div class="outputStat ms ws">
+			<label>生命：<input type="text" id="result_hp" readonly></label>
+		</div>
+		<div class="outputStat ms ws es">
+			<label>戰力：<input type="text" id="result_power" readonly></label>
+		</div>
+		
+		<script>
+			let unit_category = "Monster";
+			let base_atk = 1;
+			let base_hp = 1;
+			let atk = 1;
+			let hp = 1;
+			let spd = 0;
+			let refine = 0;
+			let extraEvolves = 0;
+			let tarLv = 1;
+			let stars = 0;
+			let maxStar = 0;
+			let awk = 0;
+			let pls = 0;
+			let masteryLevel = 0;
+			let isCosmo = false;
+			
+			document.addEventListener('DOMContentLoaded', initScreen);
+			
+			function changeCategory() {
+				unit_category = document.querySelector("input[name='unit_category']:checked").value;
+				initScreen()
+				
+				document.querySelectorAll(".inputStat, .outputStat").forEach(function(el) {
+					el.style.display = "none";
+				});
+				
+				document.querySelectorAll(".mo, .wo").forEach(function(el) {
+					el.style.display = "none";
+				});
+				
+				if (unit_category === "Equipment") {
+					document.querySelectorAll(".es").forEach(function(el) {
+						el.style.display = "block";
+					});
+				} else {
+					if (unit_category === "Weapon") {
+						document.querySelectorAll(".ws, .wo").forEach(function(el) {
+							el.style.display = "block";
+						});
+					} else {
+						document.querySelectorAll(".ms, .mo").forEach(function(el) {
+							el.style.display = "block";
+						});
+					}
+				}
+				
+				document.querySelectorAll('.chooseOption input[type="checkbox"]').forEach(el => el.checked = true);
+			}
+			
+			
+			function calcPower() {
+				unit_category = document.querySelector("input[name='unit_category']:checked").value;
+				
+				if (!checkInput()) return;
+				
+				document.querySelectorAll(".outputStat input").forEach(el => el.value = "");
+				
+				
+				if (unit_category !== "Equipment") {
+					if (unit_category == "Weapon") {
+						document.getElementById("result_atk").value = Math.floor(calculateStatAprox(true, base_atk, false)).toLocaleString();
+						document.getElementById("result_hp").value = Math.floor(calculateStatAprox(false, base_hp, false)).toLocaleString();
+					} else if (unit_category == "Monster") {
+						document.getElementById("result_atk").value = bankersRound(calculateStatAprox(true, base_atk, false)).toLocaleString();
+						document.getElementById("result_hp").value = bankersRound(calculateStatAprox(false, base_hp, false)).toLocaleString();
+					}
+					document.getElementById("result_power").value = calculateFinalPower(Math.floor(calculateStatAprox(true, base_atk, true)), Math.floor(calculateStatAprox(false, base_hp, true))).toLocaleString();
+				} else {
+					document.getElementById("result_atk").value = "";
+					document.getElementById("result_hp").value = "";
+					document.getElementById("result_power").value = calculateFinalPower(atk, hp).toLocaleString();
+				}
+				
+			}
+			
+			function checkInput() {
+				tempVal = parseInt(document.getElementById("base_atk").value);
+				if (!isNaN(tempVal) && Number.isInteger(tempVal) && tempVal > 0) {
+					base_atk = tempVal;
+				} else {
+					alert("攻擊力應為正整數");
+					return false;
+				}
+				
+				tempVal = parseInt(document.getElementById("base_hp").value);
+				if (!isNaN(tempVal) && Number.isInteger(tempVal) && tempVal > 0) {
+					base_hp = tempVal;
+				} else {
+					alert("生命應為正整數");
+					return false;
+				}
+				
+				tempVal = parseInt(document.getElementById("atk").value);
+				if (!isNaN(tempVal) && Number.isInteger(tempVal) && tempVal >= 0) {
+					atk = tempVal;
+				} else {
+					alert("攻擊力應為整數");
+					return false;
+				}
+				
+				tempVal = parseInt(document.getElementById("hp").value);
+				if (!isNaN(tempVal) && Number.isInteger(tempVal) && tempVal >= 0) {
+					hp = tempVal;
+				} else {
+					alert("生命應為整數");
+					return false;
+				}
+				
+				tempVal = parseInt(document.getElementById("speed").value);
+				if (!isNaN(tempVal) && Number.isInteger(tempVal) && tempVal >= 0) {
+					spd = tempVal;
+				} else {
+					alert("生命應為0以上整數");
+					return false;
+				}
+				
+				tempVal = parseInt(document.getElementById("potential").value);
+				if (!isNaN(tempVal) && Number.isInteger(tempVal) && tempVal >= 0 && tempVal <= 10000) {
+					refine = tempVal;
+				} else {
+					alert("潛能應為 0~10000 的整數");
+					return false;
+				}
+				
+				tempVal = parseInt(document.getElementById("level").value);
+				if (!isNaN(tempVal) && Number.isInteger(tempVal) && tempVal >= 1) {
+					tarLv = tempVal;
+				} else {
+					alert("等級應為 1~200 的整數");
+					return false;
+				}
+				
+				tempVal = parseInt(document.getElementById("limit_break").value);
+				if (!isNaN(tempVal) && Number.isInteger(tempVal) && tempVal >= 0 && tempVal <= 5) {
+					extraEvolves = tempVal;
+				} else {
+					alert("突破應為 0～5 的整數");
+					return false;
+				}
+				
+				tempVal = parseInt(document.getElementById("stars").value);
+				if (!isNaN(tempVal) && Number.isInteger(tempVal) && tempVal >= 0 && tempVal <= 6) {
+					stars = tempVal;
+				} else {
+					alert("星數應為 0～6 的整數");
+					return false;
+				}
+				
+				tempVal = parseInt(document.getElementById("max_star").value);
+				if (!isNaN(tempVal) && Number.isInteger(tempVal) && tempVal >= 0 && tempVal <= 6) {
+					maxStar = tempVal;
+				} else {
+					alert("最大應為 0～6 的整數");
+					return false;
+				}
+				
+				tempVal = parseInt(document.getElementById("awakening").value);
+				if (!isNaN(tempVal) && Number.isInteger(tempVal) && tempVal >= 0 && tempVal <= 4) {
+					awk = tempVal;
+				} else {
+					alert("覺醒應為 0～4 的整數");
+					return false;
+				}
+				
+				tempVal = parseInt(document.getElementById("boost").value);
+				if (!isNaN(tempVal) && Number.isInteger(tempVal) && tempVal >= 0 && tempVal <= 300) {
+					pls = tempVal;
+				} else {
+					alert("增幅應為 0～300 的整數");
+					return false;
+				}
+				
+				tempVal = parseInt(document.getElementById("mastery").value);
+				if (!isNaN(tempVal) && Number.isInteger(tempVal) && tempVal >= 0 && tempVal <= 40) {
+					masteryLevel = tempVal;
+				} else {
+					alert("昇華應為 0～40 的整數");
+					return false;
+				}
+				
+				isCosmo = document.getElementById("ascended").checked;
+				
+				if (stars > maxStar) {
+					alert("星數不應該大於最大星數");
+					return false;
+				}
+				
+				return true;
+			}
+			
+			
+			function calculateStatAprox(isAtk, baseStat, forPower) {
+				statVal = (extraEvolves * 0.08 + 1) * (refine / 10000 + 1) * (baseStat * (1 + (tarLv - 30) * 0.025));
+				
+				if (forPower) {
+					tempVal_awk1 = statVal * awkBonus();
+					tempVal_awk2 = statVal + multAwk(isAtk) * awk;
+					statVal = Math.max(tempVal_awk1, tempVal_awk2);
+				} else {
+					statVal = statVal * awkBonus();
+				}
+				statVal = statVal + calcPlusPow(isAtk);
+				
+				if ((unit_category == "Monster") && isCosmo) {
+					statVal = statVal + (baseStat * (1 + (getMaxLv() - 30) * 0.025)) * (refine / 10000 + 1) * 0.07;
+				}
+				
+				return statVal;
+			}
+			
+			function multAwk(isAtk) {
+				switch (maxStar) {
+					case 6:
+						return isAtk ? 248 : 1239;
+					case 5:
+						return isAtk ? 82 : 412;
+					case 4:
+						return isAtk ? 40 : 201;
+					default:
+						return 0;
+				}
+			}
+			
+			function awkBonus() {
+				let bonus = 1;
+				
+				switch (maxStar) {
+					case 4:
+						bonus = awk * 0.05 + 1;
+						break;
+					case 5:
+						bonus = awk * 0.075 + 1;
+						break;
+					case 6:
+						if (unit_category == "Weapon") {
+							switch (awk) {
+								case 1:
+									bonus = 1.19;
+									break;
+								case 2:
+									bonus = 1.33;
+									break;
+								case 3:
+									bonus = 1.44;
+									break;
+								case 4:
+									bonus = 1.55;
+									break;
+							}
+						} else {
+							switch (awk) {
+								case 1:
+									bonus = 1.22;
+									break;
+								case 2:
+									bonus = 1.44;
+									break;
+								case 3:
+									bonus = 1.66;
+									break;
+								case 4:
+									bonus = 1.88;
+									break;
+							}
+						}
+						break;
+				}
+				return bonus;
+			}
+			
+			function calcPlusPow(isAtk) {
+				let plsUnder90, plsOver90;
+				
+				if (pls > 90) {
+					plsUnder90 = 90;
+					plsOver90 = pls - 90;
+				} else {
+					plsUnder90 = pls;
+					plsOver90 = 0;
+				}
+				
+				let multPlsUnder90;
+				let multPlsOver90 = (unit_category == "Weapon") ? 14 : 311;
+				let multPlsOver90Atk = (unit_category == "Weapon") ? 3 : 73;
+				
+				if (isAtk) {
+					multPlsUnder90 = 3;
+					multPlsOver90 = multPlsOver90Atk;
+				} else {
+					multPlsUnder90 = 14;
+				}
+				
+				let powPlsUnder90 = multPlsUnder90 * plsUnder90;
+				let powPlsOver90 = multPlsOver90 * plsOver90;
+				
+				return powPlsUnder90 + powPlsOver90;
+			}
+			
+			
+			function getMaxLv() {
+				let level = 30;
+				
+				if (stars <= 3) {
+					if (stars === 3 && maxStar === 4) {
+						level = 50;
+					} else {
+						level = 30;
+					}
+				} else {
+					if (stars === 4) level = 60;
+					if (stars === 5) level = 80;
+					if (stars === 6) level = 100;
+					
+					if (stars === maxStar) level += 20 * 5;
+				}
+				
+				return level;
+			}
+			
+			function calculateFinalPower(trueAtk, trueHp) {
+				let finalPower = 0;
+				if (unit_category == "Monster") {
+					finalPower = (trueAtk * 30 + trueHp * 6) * (1 + masteryLevel * 0.005);
+					if (maxStar === 6) finalPower *= 2;
+					if (maxStar === 5) finalPower *= 1.5;
+				} else if (unit_category == "Weapon") {
+					finalPower = (trueAtk * 30 + trueHp * 6);
+				} else {
+					return atk * 30 + hp * 6 + spd * 180;
+				}
+				return bankersRound(finalPower);
+			}
+			
+			
+			function bankersRound(x) {
+				let intPart = Math.floor(x);
+				let frac = x - intPart;
+				
+				if (Math.abs(frac) !== 0.5) {
+					return Math.round(x); // 四捨五入
+				} else {
+					// 五留雙邏輯
+					return (intPart % 2 === 0) ? intPart : intPart + (x > 0 ? 1 : -1);
+				}
+			}
+			
+			function maxStat() {
+				checkInput();
+				let maxLv = getMaxLv();
+				document.getElementById("level").value = maxLv;
+				document.getElementById("limit_break").value = (maxStar < 4) ? 0 : (maxStar !== stars) ? 0 : 5;
+				//document.getElementById("stars").value = 6;
+				//document.getElementById("max_star").value = 6;
+				document.getElementById("awakening").value = (maxStar < 4) ? 0 : 4;
+				document.getElementById("potential").value = (maxLv >= 40) ? 10000 : 0;
+				document.getElementById("boost").value = 300;
+				document.getElementById("mastery").value = (maxStar < 4) ? 0 : 40;
+				document.getElementById("ascended").checked = (maxStar === 6) ? true : false;
+				
+			}
+			
+			function initScreen() {
+				document.getElementById("base_atk").value = 1;
+				document.getElementById("base_hp").value = 1;
+				document.getElementById("atk").value = 1;
+				document.getElementById("hp").value = 1;
+				document.getElementById("speed").value = 0
+				document.getElementById("potential").value = 0;
+				document.getElementById("level").value = 1;
+				document.getElementById("limit_break").value = 0;
+				document.getElementById("stars").value = 0;
+				document.getElementById("max_star").value = 0;
+				document.getElementById("awakening").value = 0;
+				document.getElementById("boost").value = 0;
+				document.getElementById("mastery").value = 0;
+				document.getElementById("ascended").checked = false;
+				
+				document.querySelectorAll(".outputStat input").forEach(el => el.value = "");
+				
+				loadSelectableData();
+				
+			}
+			
+			let jsonData = {};
+			const dataUrl = "https://evertale-playertw.github.io/mytest/InfoForPowerCalc.json";
+			
+			function loadSelectableData() {
+				fetch(dataUrl)
+					.then(response => response.json())
+					.then(json => {
+						jsonData = json;
+						setSelectableList();
+					})
+					.catch(error => {
+						console.error("讀取 JSON 發生錯誤：", error);
+					});
+			}
+			
+			function setSelectableList() {
+				const targetSelect = document.getElementById("targetSelect");
+				targetSelect.innerHTML = '<option value="">▼▼ 選擇對象以自動帶入參數，或手動填入數值▼▼</option>';
+				
+				const selectedRarities = Array.from(document.querySelectorAll('#filterRarity input:checked')).map(cb => cb.value);
+				const selectedElements = Array.from(document.querySelectorAll('#filterElement input:checked')).map(cb => cb.value);
+				const selectedWeaponTypes = Array.from(document.querySelectorAll('#filterWeaponType input:checked')).map(cb => cb.value);
+				
+				for (const id in jsonData[unit_category]) {
+					const entry = jsonData[unit_category][id];
+					const option = document.createElement("option");
+					
+					if (!selectedRarities.includes(entry.Rarity)) continue;
+					if (unit_category === "Monster" && !selectedElements.includes(entry.Element)) continue;
+					if (unit_category === "Weapon" && !selectedWeaponTypes.includes(entry.Type)) continue;
+					
+					let name = entry.FullName;
+					option.value = id;
+					option.text = name;
+					targetSelect.appendChild(option);
+				}
+			}
+			
+			function fillInfo() {
+				const id = document.getElementById("targetSelect").value;
+				if (id == "") return;
+				
+				const item = jsonData[unit_category][id];
+				
+				if (unit_category === "Equipment") {
+					document.getElementById("atk").value = item.Atk;
+					document.getElementById("hp").value = item.Hp;
+					document.getElementById("speed").value = item.Speed;
+				} else {
+					document.getElementById("base_atk").value = item.Atk_Base;
+					document.getElementById("base_hp").value = item.Hp_Base;
+					document.getElementById("stars").value = item.Stars;
+					document.getElementById("max_star").value = item.StarMax;
+				}
+				
+				checkInput();
+			}
+			
+			function toggleAllCheckboxes(event) {
+				if (!(event.target === event.currentTarget)) return;
+				
+				const checkboxes = event.currentTarget.querySelectorAll('input[type="checkbox"]');
+				
+				// 檢查目前是否全選
+				const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+				checkboxes.forEach(cb => cb.checked = !allChecked);
+				
+				setSelectableList();
+			}
+		</script>
+	</body>
+	
+</html>
