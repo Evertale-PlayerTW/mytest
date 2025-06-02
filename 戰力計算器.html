@@ -65,7 +65,7 @@
 				font-size: 1em;
 			}
 			
-			div:has(button) {
+			.button {
 				text-align: center;
 			}
 			
@@ -91,10 +91,13 @@
 				/* For Firefox */
 				text-align: center;
 				text-align-last: center;
+				-moz-text-align-last: center;
 			}
 			
 			option:first-child {
 				text-align: center;
+				text-align-last: center;
+				-moz-text-align-last: center;
 			}
 			
 			option:not(:first-child) {
@@ -204,10 +207,10 @@
 		</div>
 		
 		<div><br></div>
-		<div>
+		<div class="button">
 			<button onclick="maxStat()">一鍵最大強化</button>
 		</div>
-		<div>
+		<div class="button">
 			<button onclick="calcPower()">計算戰力</button>
 		</div>
 		
