@@ -3,7 +3,7 @@
 	
 	<head>
 		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>戰力計算器</title>
 		<style>
 			body {
@@ -157,7 +157,7 @@
 		</div>
 		
 		<select id="targetSelect" onchange="fillInfo()">
-			<option value="">▼ 選擇對象以自動帶入參數，或手動填入數值 ▼</option>
+			<option value="" disabled selected hidden>▼ 選擇對象以自動帶入參數，或手動填入數值 ▼</option>
 		</select>
 		
 		<div>
@@ -176,7 +176,7 @@
 			<label id="hpLabel">生命<span class="hint">(整數)</span>：<input type="number" id="hp" value="1" step="1"></label>
 		</div>
 		<div class="inputStat es" style="display: none;">
-			<label>速度<span class="hint">(正整數)</span>：<input type="number" id="speed" value="1" step="1"></label>
+			<label>速度<span class="hint">(整數)</span>：<input type="number" id="speed" value="1" step="1"></label>
 		</div>
 		<div class="inputStat ms ws">
 			<label>星數<span class="hint">(整數0~6)</span>：<input type="number" id="stars" value="0" min="0" max="6" step="1"></label>
@@ -221,10 +221,10 @@
 			<label>攻擊力：<input type="text" id="result_atk" readonly></label>
 		</div>
 		<div class="outputStat ms ws">
-			<label>生命：<input type="text" id="result_hp" readonly></label>
+			<label>生　命：<input type="text" id="result_hp" readonly></label>
 		</div>
 		<div class="outputStat ms ws es">
-			<label>戰力：<input type="text" id="result_power" readonly></label>
+			<label>戰　力：<input type="text" id="result_power" readonly></label>
 		</div>
 		
 		<script>
@@ -324,7 +324,7 @@
 				if (!isNaN(tempVal) && Number.isInteger(tempVal) && tempVal >= 0) {
 					atk = tempVal;
 				} else {
-					alert("攻擊力應為整數");
+					alert("攻擊力應為0以上整數");
 					return false;
 				}
 				
@@ -332,7 +332,7 @@
 				if (!isNaN(tempVal) && Number.isInteger(tempVal) && tempVal >= 0) {
 					hp = tempVal;
 				} else {
-					alert("生命應為整數");
+					alert("生命應為0以上整數");
 					return false;
 				}
 				
@@ -340,7 +340,7 @@
 				if (!isNaN(tempVal) && Number.isInteger(tempVal) && tempVal >= 0) {
 					spd = tempVal;
 				} else {
-					alert("生命應為0以上整數");
+					alert("速度應為0以上整數");
 					return false;
 				}
 				
@@ -348,7 +348,7 @@
 				if (!isNaN(tempVal) && Number.isInteger(tempVal) && tempVal >= 0 && tempVal <= 10000) {
 					refine = tempVal;
 				} else {
-					alert("潛能應為 0~10000 的整數");
+					alert("潛能應為0~10000整數");
 					return false;
 				}
 				
@@ -356,7 +356,7 @@
 				if (!isNaN(tempVal) && Number.isInteger(tempVal) && tempVal >= 1) {
 					tarLv = tempVal;
 				} else {
-					alert("等級應為 1~200 的整數");
+					alert("等級應為1~200整數");
 					return false;
 				}
 				
@@ -364,7 +364,7 @@
 				if (!isNaN(tempVal) && Number.isInteger(tempVal) && tempVal >= 0 && tempVal <= 5) {
 					extraEvolves = tempVal;
 				} else {
-					alert("突破應為 0～5 的整數");
+					alert("突破應為0～5整數");
 					return false;
 				}
 				
@@ -372,7 +372,7 @@
 				if (!isNaN(tempVal) && Number.isInteger(tempVal) && tempVal >= 0 && tempVal <= 6) {
 					stars = tempVal;
 				} else {
-					alert("星數應為 0～6 的整數");
+					alert("星數應為0～6整數");
 					return false;
 				}
 				
@@ -380,7 +380,7 @@
 				if (!isNaN(tempVal) && Number.isInteger(tempVal) && tempVal >= 0 && tempVal <= 6) {
 					maxStar = tempVal;
 				} else {
-					alert("最大應為 0～6 的整數");
+					alert("最大星數應為0～6整數");
 					return false;
 				}
 				
@@ -388,7 +388,7 @@
 				if (!isNaN(tempVal) && Number.isInteger(tempVal) && tempVal >= 0 && tempVal <= 4) {
 					awk = tempVal;
 				} else {
-					alert("覺醒應為 0～4 的整數");
+					alert("覺醒應為0～4整數");
 					return false;
 				}
 				
@@ -396,7 +396,7 @@
 				if (!isNaN(tempVal) && Number.isInteger(tempVal) && tempVal >= 0 && tempVal <= 300) {
 					pls = tempVal;
 				} else {
-					alert("增幅應為 0～300 的整數");
+					alert("增幅應為0～300整數");
 					return false;
 				}
 				
@@ -404,7 +404,7 @@
 				if (!isNaN(tempVal) && Number.isInteger(tempVal) && tempVal >= 0 && tempVal <= 40) {
 					masteryLevel = tempVal;
 				} else {
-					alert("昇華應為 0～40 的整數");
+					alert("昇華應為0～40整數");
 					return false;
 				}
 				
@@ -612,6 +612,7 @@
 			}
 			
 			let jsonData = {};
+			const initSelectOptionContent = document.getElementById("targetSelect").innerHTML;
 			const dataUrl = "InfoForPowerCalc.json";
 			
 			function loadSelectableData() {
@@ -628,7 +629,7 @@
 			
 			function setSelectableList() {
 				const targetSelect = document.getElementById("targetSelect");
-				targetSelect.innerHTML = '<option value="">▼ 選擇對象以自動帶入參數，或手動填入數值 ▼</option>';
+				targetSelect.innerHTML = initSelectOptionContent;
 				
 				const selectedRarities = Array.from(document.querySelectorAll('#filterRarity input:checked')).map(cb => cb.value);
 				const selectedElements = Array.from(document.querySelectorAll('#filterElement input:checked')).map(cb => cb.value);
