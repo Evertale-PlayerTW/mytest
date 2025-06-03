@@ -12,12 +12,13 @@
 				padding: 0.5rem;
 				box-sizing: border-box;
 			}
-						
-			.hint, .description {
+			
+			.hint,
+			.description {
 				font-size: 0.7em;
 				text-align: right;
 			}
-						
+			
 			input[type="number"] {
 				/*text-align: right; */
 			}
@@ -32,7 +33,7 @@
 				gap: 5px;
 			}
 			
-			.inputStat {				
+			.inputStat {
 				border: 1px solid black;
 				padding: 5px;
 			}
@@ -45,16 +46,20 @@
 			}
 			
 			.outputStat label {
-				display: flex;
+				display: grid;
+				grid-template-columns: 3fr auto 7fr;
+				align-self: center;
+				justify-content: center;
 				align-items: center;
-				justify-content: space-between;
+				margin: 5px auto;
 			}
 			
-			label input {
-				flex: 1;
-				min-width: 0;
-				margin-left: 10px;
-				margin: 5px auto;
+			.outputStat .description {
+				line-height: 0.9;
+			}
+			
+			.outputStat * {
+				text-align: center;
 			}
 			
 			.chooseOption {
@@ -178,9 +183,9 @@
 			<option value="" disabled selected hidden>▼ 選擇對象以自動帶入參數，或手動填入數值 ▼</option>
 		</select>
 		
-		<div>
-			<hr>
-		</div>
+		
+		<hr>
+		
 		<div class="inputGroup">
 			<div class="inputStat ms ws">
 				<label id="baseAtkLabel">基礎攻擊力<input type="number" id="base_atk" value="1" step="1"></label>
@@ -204,35 +209,35 @@
 			</div>
 			<div class="inputStat ms ws">
 				<label>星數<input type="number" id="stars" value="0" min="0" max="6" step="1"></label>
-				<div class="hint">整數0~6</div>
+				<div class="hint">整數:0~6</div>
 			</div>
 			<div class="inputStat ms ws">
 				<label>最大星數<input type="number" id="max_star" value="0" min="0" max="6" step="1"></label>
-				<div class="hint">整數0~6</div>
+				<div class="hint">整數:0~6</div>
 			</div>
 			<div class="inputStat ms ws">
 				<label>等級<input type="number" id="level" value="1" min="1" max="200" step="1"></label>
-				<div class="hint">整數1~200</div>
+				<div class="hint">整數:1~200</div>
 			</div>
 			<div class="inputStat ms ws">
-				<label>突破<span class="description ">(不含進化升星之次數)</span><input type="number" id="limit_break" value="0" min="0" max="5" step="1"></label>
-					<div class="hint">整數0~5</div>
+				<label>突破<span class="description ">(不含進化(升星)之次數)</span><input type="number" id="limit_break" value="0" min="0" max="5" step="1"></label>
+				<div class="hint">整數:0~5</div>
 			</div>
 			<div class="inputStat ms ws">
 				<label>覺醒<input type="number" id="awakening" value="0" min="0" max="4" step="1"></label>
-				<div class="hint">整數0~4</div>
+				<div class="hint">整數:0~4</div>
 			</div>
 			<div class="inputStat ms ws">
 				<label>增幅<input type="number" id="boost" value="0" min="0" max="300" step="1"></label>
-				<div class="hint">整數0~300</div>
+				<div class="hint">整數:0~300</div>
 			</div>
 			<div class="inputStat ms ws">
 				<label>潛能<input type="number" id="potential" value="0" min="0" max="10000" step="1"></label>
-				<div class="hint">整數0~10000</div>
+				<div class="hint">整數:0~10000</div>
 			</div>
 			<div class="inputStat ms">
 				<label>昇華<input type="number" id="mastery" value="0" min="0" max="40" step="1"></label>
-				<div class="hint">整數0~40</div>
+				<div class="hint">整數:0~40</div>
 			</div>
 			<div class="inputStat ms">
 				<label>已超越：<input type="checkbox" id="ascended"></label>
@@ -247,17 +252,27 @@
 			<button onclick="calcPower()">計算戰力</button>
 		</div>
 		
-		<div>
-			<hr>
-		</div>
-		<div class="outputStat ms ws">
-			<label>攻擊力：<input type="text" id="result_atk" readonly></label>
-		</div>
-		<div class="outputStat ms ws">
-			<label>生　命：<input type="text" id="result_hp" readonly></label>
-		</div>
-		<div class="outputStat ms ws es">
-			<label>戰　力：<input type="text" id="result_power" readonly></label>
+		
+		<hr>
+		
+		<div class="outputGroup">
+			<div class="outputStat ms ws">
+				<label>
+					<div>攻擊力<div class="description ">未計被動加成</div>
+					</div><span>：</span><input type="text" id="result_atk" readonly>
+				</label>
+			</div>
+			<div class="outputStat ms ws">
+				<label>
+					<div>生　命<div class="description ">未計被動加成</div>
+					</div><span>：</span><input type="text" id="result_hp" readonly>
+				</label>
+			</div>
+			<div class="outputStat ms ws es">
+				<label>
+					<div>戰　力</div>：<input type="text" id="result_power" readonly>
+				</label>
+			</div>
 		</div>
 		
 		<script>
