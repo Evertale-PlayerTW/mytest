@@ -13,10 +13,11 @@
 				box-sizing: border-box;
 			}
 						
-			.hint {
+			.hint, .description {
 				font-size: 0.7em;
+				text-align: right;
 			}
-			
+						
 			input[type="number"] {
 				/*text-align: right; */
 			}
@@ -25,7 +26,24 @@
 				text-align: right;
 			}
 			
-			.inputStat label,
+			.inputGroup {
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
+				gap: 5px;
+			}
+			
+			.inputStat {				
+				border: 1px solid black;
+				padding: 5px;
+			}
+			
+			.inputStat input {
+				width: 100%;
+				box-sizing: border-box;
+				margin-bottom: 0px;
+				border: 0.5px dotted gray;
+			}
+			
 			.outputStat label {
 				display: flex;
 				align-items: center;
@@ -163,47 +181,62 @@
 		<div>
 			<hr>
 		</div>
-		<div class="inputStat ms ws">
-			<label id="baseAtkLabel">基礎攻擊力<span class="hint">(正整數)</span>：<input type="number" id="base_atk" value="1" step="1"></label>
-		</div>
-		<div class="inputStat ms ws">
-			<label id="baseHpLabel">基礎生命<span class="hint">(正整數)</span>：<input type="number" id="base_hp" value="1" step="1"></label>
-		</div>
-		<div class="inputStat es" style="display: none;">
-			<label id="atkLabel">攻擊力<span class="hint">(整數)</span>：<input type="number" id="atk" value="1" step="1"></label>
-		</div>
-		<div class="inputStat es" style="display: none;">
-			<label id="hpLabel">生命<span class="hint">(整數)</span>：<input type="number" id="hp" value="1" step="1"></label>
-		</div>
-		<div class="inputStat es" style="display: none;">
-			<label>速度<span class="hint">(整數)</span>：<input type="number" id="speed" value="1" step="1"></label>
-		</div>
-		<div class="inputStat ms ws">
-			<label>星數<span class="hint">(整數0~6)</span>：<input type="number" id="stars" value="0" min="0" max="6" step="1"></label>
-		</div>
-		<div class="inputStat ms ws">
-			<label>最大星數<span class="hint">(整數0~6)</span>：<input type="number" id="max_star" value="0" min="0" max="6" step="1"></label>
-		</div>
-		<div class="inputStat ms ws">
-			<label>等級<span class="hint">(整數1~200)</span>：<input type="number" id="level" value="1" min="1" max="200" step="1"></label>
-		</div>
-		<div class="inputStat ms ws">
-			<label>突破<span class="hint">(不含進化(升星)之次數。整數0~5)</span>：<input type="number" id="limit_break" value="0" min="0" max="5" step="1"></label>
-		</div>
-		<div class="inputStat ms ws">
-			<label>覺醒<span class="hint">(整數0~4)</span>：<input type="number" id="awakening" value="0" min="0" max="4" step="1"></label>
-		</div>
-		<div class="inputStat ms ws">
-			<label>增幅<span class="hint">(整數0~300)</span>：<input type="number" id="boost" value="0" min="0" max="300" step="1"></label>
-		</div>
-		<div class="inputStat ms ws">
-			<label>潛能<span class="hint">(整數0~10000)</span>：<input type="number" id="potential" value="0" min="0" max="10000" step="1"></label>
-		</div>
-		<div class="inputStat ms">
-			<label>昇華<span class="hint">(整數0~40)</span>：<input type="number" id="mastery" value="0" min="0" max="40" step="1"></label>
-		</div>
-		<div class="inputStat ms">
-			<label>已超越：<input type="checkbox" id="ascended"></label>
+		<div class="inputGroup">
+			<div class="inputStat ms ws">
+				<label id="baseAtkLabel">基礎攻擊力<input type="number" id="base_atk" value="1" step="1"></label>
+				<div class="hint">正整數</div>
+			</div>
+			<div class="inputStat ms ws">
+				<label id="baseHpLabel">基礎生命<input type="number" id="base_hp" value="1" step="1"></label>
+				<div class="hint">正整數</div>
+			</div>
+			<div class="inputStat es" style="display: none;">
+				<label id="atkLabel">攻擊力<input type="number" id="atk" value="1" step="1"></label>
+				<div class="hint">整數</div>
+			</div>
+			<div class="inputStat es" style="display: none;">
+				<label id="hpLabel">生命<input type="number" id="hp" value="1" step="1"></label>
+				<div class="hint">整數</div>
+			</div>
+			<div class="inputStat es" style="display: none;">
+				<label>速度<input type="number" id="speed" value="1" step="1"></label>
+				<div class="hint">整數</div>
+			</div>
+			<div class="inputStat ms ws">
+				<label>星數<input type="number" id="stars" value="0" min="0" max="6" step="1"></label>
+				<div class="hint">整數0~6</div>
+			</div>
+			<div class="inputStat ms ws">
+				<label>最大星數<input type="number" id="max_star" value="0" min="0" max="6" step="1"></label>
+				<div class="hint">整數0~6</div>
+			</div>
+			<div class="inputStat ms ws">
+				<label>等級<input type="number" id="level" value="1" min="1" max="200" step="1"></label>
+				<div class="hint">整數1~200</div>
+			</div>
+			<div class="inputStat ms ws">
+				<label>突破<span class="description ">(不含進化升星之次數)</span><input type="number" id="limit_break" value="0" min="0" max="5" step="1"></label>
+					<div class="hint">整數0~5</div>
+			</div>
+			<div class="inputStat ms ws">
+				<label>覺醒<input type="number" id="awakening" value="0" min="0" max="4" step="1"></label>
+				<div class="hint">整數0~4</div>
+			</div>
+			<div class="inputStat ms ws">
+				<label>增幅<input type="number" id="boost" value="0" min="0" max="300" step="1"></label>
+				<div class="hint">整數0~300</div>
+			</div>
+			<div class="inputStat ms ws">
+				<label>潛能<input type="number" id="potential" value="0" min="0" max="10000" step="1"></label>
+				<div class="hint">整數0~10000</div>
+			</div>
+			<div class="inputStat ms">
+				<label>昇華<input type="number" id="mastery" value="0" min="0" max="40" step="1"></label>
+				<div class="hint">整數0~40</div>
+			</div>
+			<div class="inputStat ms">
+				<label>已超越：<input type="checkbox" id="ascended"></label>
+			</div>
 		</div>
 		
 		<div><br></div>
