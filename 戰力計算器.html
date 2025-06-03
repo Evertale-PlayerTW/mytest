@@ -79,7 +79,15 @@
 			#filterWeaponType {
 				border: 1px solid black;
 				margin: 5px 0;
-				padding: 10px;
+				padding: 5px;
+				position: relative;
+			}
+			
+			.toggleAll {
+				position: absolute;
+				top: 0;
+				left: 0;
+				font-size: 1.2em;
 			}
 			
 			#targetSelect {
@@ -141,8 +149,8 @@
 			<label><input type="radio" name="unit_category" value="Equipment" onchange="changeCategory()">飾品</label>
 		</div>
 		
-		<div id="filterRarity" onclick="toggleAllCheckboxes(event)">
-			
+		<div id="filterRarity">
+			<div class="toggleAll" onclick="toggleAllCheckboxes(this)">◎</div>
 			<div class="chooseOption">
 				<label><input type="checkbox" value="N" onchange="setSelectableList()" checked>N</label>
 				<label><input type="checkbox" value="R" onchange="setSelectableList()" checked>R</label>
@@ -151,7 +159,8 @@
 			</div>
 		</div>
 		
-		<div id="filterElement" class="mo" onclick="toggleAllCheckboxes(event)">
+		<div id="filterElement" class="mo">
+			<div class="toggleAll" onclick="toggleAllCheckboxes(this)">◎</div>
 			<div class="chooseOption">
 				<label><input type="checkbox" value="Fire" onchange="setSelectableList()" checked>火</label>
 				<label><input type="checkbox" value="Water" onchange="setSelectableList()" checked>水</label>
@@ -162,7 +171,8 @@
 			</div>
 		</div>
 		
-		<div id="filterWeaponType" class="wo" style="display: none;" onclick="toggleAllCheckboxes(event)">
+		<div id="filterWeaponType" class="wo" style="display: none;">
+			<div class="toggleAll" onclick="toggleAllCheckboxes(this)">◎</div>
 			<div class="chooseOption" id="filterWeaponTypeYellow">
 				<label><input type="checkbox" value="Sword" onchange="setSelectableList()" checked>單手劍</label>
 				<label><input type="checkbox" value="Axe" onchange="setSelectableList()" checked>單手斧</label>
@@ -720,10 +730,8 @@
 				checkInput();
 			}
 			
-			function toggleAllCheckboxes(event) {
-				if (!(event.target === event.currentTarget)) return;
-				
-				const checkboxes = event.currentTarget.querySelectorAll('input[type="checkbox"]');
+			function toggleAllCheckboxes(toggleElement) {
+				const checkboxes = toggleElement.parentNode.querySelectorAll('input[type="checkbox"]');
 				
 				// 檢查目前是否全選
 				const allChecked = Array.from(checkboxes).every(cb => cb.checked);
