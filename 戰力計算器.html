@@ -85,9 +85,12 @@
 			
 			.toggleAll {
 				position: absolute;
-				top: 0;
-				left: 0;
-				font-size: 1.2em;
+				top: calc(50% - 0.4em);
+				left: -0.4em;
+				background-color: gray;
+				border-radius: 50%;
+				width: 0.8em;
+				height: 0.8em;
 			}
 			
 			#targetSelect {
@@ -150,7 +153,7 @@
 		</div>
 		
 		<div id="filterRarity">
-			<div class="toggleAll" onclick="toggleAllCheckboxes(this)">◎</div>
+			<div class="toggleAll" onclick="toggleAllCheckboxes(this)"></div>
 			<div class="chooseOption">
 				<label><input type="checkbox" value="N" onchange="setSelectableList()" checked>N</label>
 				<label><input type="checkbox" value="R" onchange="setSelectableList()" checked>R</label>
@@ -160,7 +163,7 @@
 		</div>
 		
 		<div id="filterElement" class="mo">
-			<div class="toggleAll" onclick="toggleAllCheckboxes(this)">◎</div>
+			<div class="toggleAll" onclick="toggleAllCheckboxes(this)"></div>
 			<div class="chooseOption">
 				<label><input type="checkbox" value="Fire" onchange="setSelectableList()" checked>火</label>
 				<label><input type="checkbox" value="Water" onchange="setSelectableList()" checked>水</label>
@@ -172,7 +175,7 @@
 		</div>
 		
 		<div id="filterWeaponType" class="wo" style="display: none;">
-			<div class="toggleAll" onclick="toggleAllCheckboxes(this)">◎</div>
+			<div class="toggleAll" onclick="toggleAllCheckboxes(this)"></div>
 			<div class="chooseOption" id="filterWeaponTypeYellow">
 				<label><input type="checkbox" value="Sword" onchange="setSelectableList()" checked>單手劍</label>
 				<label><input type="checkbox" value="Axe" onchange="setSelectableList()" checked>單手斧</label>
@@ -731,7 +734,7 @@
 			}
 			
 			function toggleAllCheckboxes(toggleElement) {
-				const checkboxes = toggleElement.parentNode.querySelectorAll('input[type="checkbox"]');
+				const checkboxes = toggleElement.parentElement.querySelectorAll('input[type="checkbox"]');
 				
 				// 檢查目前是否全選
 				const allChecked = Array.from(checkboxes).every(cb => cb.checked);
