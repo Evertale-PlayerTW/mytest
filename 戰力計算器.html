@@ -196,15 +196,15 @@
 				<div class="hint">正整數</div>
 			</div>
 			<div class="inputStat es" style="display: none;">
-				<label id="atkLabel">攻擊力<input type="number" id="atk" value="1" step="1"></label>
+				<label id="atkLabel">攻擊力<input type="number" id="atk" value="0" step="1"></label>
 				<div class="hint">整數</div>
 			</div>
 			<div class="inputStat es" style="display: none;">
-				<label id="hpLabel">生命<input type="number" id="hp" value="1" step="1"></label>
+				<label id="hpLabel">生命<input type="number" id="hp" value="0" step="1"></label>
 				<div class="hint">整數</div>
 			</div>
 			<div class="inputStat es" style="display: none;">
-				<label>速度<input type="number" id="speed" value="1" step="1"></label>
+				<label>速度<input type="number" id="speed" value="0" step="1"></label>
 				<div class="hint">整數</div>
 			</div>
 			<div class="inputStat ms ws">
@@ -310,6 +310,7 @@
 					document.querySelectorAll(".es").forEach(function(el) {
 						el.style.display = "block";
 					});
+					document.querySelector('.inputGroup').style.gridTemplateColumns = 'repeat(3, 1fr)';
 				} else {
 					if (unit_category === "Weapon") {
 						document.querySelectorAll(".ws, .wo").forEach(function(el) {
@@ -320,6 +321,7 @@
 							el.style.display = "block";
 						});
 					}
+					document.querySelector('.inputGroup').style.gridTemplateColumns = 'repeat(2, 1fr)';
 				}
 				
 				document.querySelectorAll('.chooseOption input[type="checkbox"]').forEach(el => el.checked = true);
@@ -640,8 +642,8 @@
 			function initScreen() {
 				document.getElementById("base_atk").value = 1;
 				document.getElementById("base_hp").value = 1;
-				document.getElementById("atk").value = 1;
-				document.getElementById("hp").value = 1;
+				document.getElementById("atk").value = 0;
+				document.getElementById("hp").value = 0;
 				document.getElementById("speed").value = 0
 				document.getElementById("potential").value = 0;
 				document.getElementById("level").value = 1;
