@@ -5912,6 +5912,24 @@
             "Element": "Death",
             "Atk_Base": 1077,
             "Hp_Base": 12658
+        },
+        "ElizabethRegular01": {
+            "FullName": "伊莉莎白 - 榮光女王 (★★★★★☆)",
+            "Rarity": "SSR",
+            "Stars": 5,
+            "StarMax": 6,
+            "Element": "Water",
+            "Atk_Base": 1156,
+            "Hp_Base": 5430
+        },
+        "ElizabethRegular02": {
+            "FullName": "伊莉莎白 - 榮光女王 (★★★★★★)",
+            "Rarity": "SSR",
+            "Stars": 6,
+            "StarMax": 6,
+            "Element": "Water",
+            "Atk_Base": 1278,
+            "Hp_Base": 8030
         }
     },
     "Weapon": {
@@ -12385,6 +12403,33 @@
             "Type": "Hammer",
             "Atk_Base": 579,
             "Hp_Base": 4105
+        },
+        "RoyalBlueGreatSword01": {
+            "FullName": "皇家恩典 (★★★★☆☆)",
+            "Rarity": "SSR",
+            "Stars": 4,
+            "StarMax": 6,
+            "Type": "GreatSword",
+            "Atk_Base": 479,
+            "Hp_Base": 2980
+        },
+        "RoyalBlueGreatSword02": {
+            "FullName": "皇家恩典 (★★★★★☆)",
+            "Rarity": "SSR",
+            "Stars": 5,
+            "StarMax": 6,
+            "Type": "GreatSword",
+            "Atk_Base": 599,
+            "Hp_Base": 3505
+        },
+        "RoyalBlueGreatSword03": {
+            "FullName": "皇家恩典 (★★★★★★)",
+            "Rarity": "SSR",
+            "Stars": 6,
+            "StarMax": 6,
+            "Type": "GreatSword",
+            "Atk_Base": 644,
+            "Hp_Base": 3780
         }
     },
     "Equipment": {
