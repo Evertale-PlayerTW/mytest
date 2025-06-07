@@ -10,7 +10,7 @@
             "Hp_Base": 1254
         },
         "FireBird01": {
-            "FullName": "幼燃鳩",
+            "FullName": "幼燃鳩 (☆)",
             "Rarity": "N",
             "Stars": 0,
             "StarMax": 1,
@@ -343,7 +343,7 @@
             "Hp_Base": 1700
         },
         "OnionBoy01": {
-            "FullName": "傀伊寶",
+            "FullName": "傀伊寶 (☆)",
             "Rarity": "N",
             "Stars": 0,
             "StarMax": 1,
@@ -2107,7 +2107,7 @@
             "Hp_Base": 1500
         },
         "FireBirdDojo01": {
-            "FullName": "幼燃鳩",
+            "FullName": "幼燃鳩 (☆)",
             "Rarity": "N",
             "Stars": 0,
             "StarMax": 1,
