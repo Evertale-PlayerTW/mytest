@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+	
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>JS測試</title>
+		<style>
+			body {
+				width: min(100%, 800px);
+				margin: auto;
+				padding: 0.5rem;
+				box-sizing: border-box;
+				font-family: "Noto Sans TC",  "Microsoft JhengHei", "PingFang TC", "Segoe UI", Arial, sans-serif;
+			}
+			
+			a {
+				color: inherit;
+				text-decoration: none;
+			}
+
+			.chooseOption {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				padding: 3px 0;
+			}
+			
+			.chooseOption label {
+				flex: 1;
+				text-align: center;
+			}
+			
+			#filterRarity,
+			#filterElement,
+			#filterWeaponType,
+			#filterStars {
+				border: 1px solid black;
+				margin: 5px 0;
+				padding: 5px;
+				position: relative;
+			}
+			
+			.toggleAll {
+				position: absolute;
+				top: calc(50% - 0.6em);
+				left: -0.4em;
+				background-color: gray;
+				border-radius: 50%;
+				width: 0.8em;
+				height: 1.2em;
+			}
+			
+			#targetSelect {
+				width: 100%;
+				height: 2em;
+				margin: 10px auto;
+				font-size: 1em;
+			}
+			
+			/* Chrome, Safari, Edge */
+			input[type="number"]::-webkit-outer-spin-button,
+			input[type="number"]::-webkit-inner-spin-button {
+				-webkit-appearance: none;
+				margin: 0;
+			}
+			
+			/* Firefox */
+			input[type="number"] {
+				-moz-appearance: textfield;
+			}
+			
+			select {
+				/* 隱藏 <select> 預設的箭頭樣式 */
+				appearance: none;
+				/* For modern browsers */
+				-webkit-appearance: none;
+				/* For Safari and Chrome */
+				-moz-appearance: none;
+				/* For Firefox */
+				text-align: center;
+				text-align-last: center;
+				-moz-text-align-last: center;
+			}
+			
+			option:first-child {
+				text-align: center;
+				text-align-last: center;
+				-moz-text-align-last: center;
+			}
+			
+			option:not(:first-child) {
+				text-align: left;
+			}
+			
+			.hidden {
+				display: none !important;
+			}
+			
+			hr {
+				margin: 1.5em -0.5em 2em -0.5em;
+			}
+			
+			#nameDisplay {
+				position: relative;
+			}
+						
+			#bigName {
+				text-align: center;
+				font-size: 3em;
+				font-weight: bold;
+			}
+			
+			#subName {
+				text-align: center;
+				font-size: 1.5em;
+			}
+			
+			#codeName {
+				position: absolute;
+				top: -4em;
+				right: 0px;
+				font-size: 0.5em;
+			}
+			
+			#viewContent {
+				padding: 0.5em;
+				margin-top: 2em;
+			}
+			
+			#generalStatsArea {
+				width: min(100%, 400px);
+				margin: auto;
+				padding: 0.5rem;
+				border: 1px solid black;
+				box-sizing: border-box;
+			}
+			
+			.infoRow {
+				display: flex;
+				align-items: center;
+				margin: 0.3em auto;
+			}
+			
+			.infoTitle {
+				width: 30%;
+				border: 1px solid black;
+				text-align: justify;
+				text-align-last: justify;
+				padding: 0.2em;
+			}
+			
+			.infoValue {
+				width: 70%;
+				text-align: center;
+			}
+			
+			.areaTitle {
+				text-align: center;
+				font-size: 2em;
+			}
+			
+			#profileContent,
+			#leaderSkillContent,
+			#weaponSkillContent,
+			#activeSkillContent,
+			#passiveSkillContent,
+			#gachaIntroContent,
+			#dialogContent,
+			#aiLogicContent {
+				border: 1px solid black;
+				padding: 0.5em;
+			}
+			
+			#hasAscended {
+				margin-top: 1.5em;
+			}
+			
+			#profileAscendedTitle {
+				border: 1px solid black;
+				font-size: 1.2em;
+				width: 50%;
+				text-align: justify;
+				text-align-last: justify;
+				margin: 0.5em auto;
+			}
+			
+			#leaderSkillName,
+			#weaponSkillName {
+				border: 1px solid black;
+				display: inline-block;
+				margin: 0 auto 0.3em 1em;
+				padding: 0 0.2em;
+			}
+			
+			#activeSkillContent,
+			#passiveSkillContent,
+			#dialogContent {
+				display: flex;
+				flex-direction: column;
+				gap: 0.5em;
+			}
+			
+			.activeSkillDetail,
+			.passiveSkillDetail {
+				display: grid;
+				grid-template-columns: 1fr minmax(10%, max-content) minmax(10%, max-content);
+				align-items: center;
+				border: 1px solid black;
+				padding: 0.5em;
+				gap: 0.4em;
+			}
+			
+			.activeSkillName,
+			.passiveSkillName {
+				display: inline-block;
+				margin-left: 1em;
+				border: 1px solid black;
+				padding: 0 0.2em;
+				width: fit-content;
+			}
+			
+			.activeSkillSpirit,
+			.activeSkillTU {
+				text-align: center;
+				border: 1px solid black;
+				border-radius: 1em;
+				height: 100%;
+				place-content: center;
+				padding: 0 0.5em;
+			}
+			
+			.activeSkillDecription,
+			.passiveSkillDecription {
+				grid-column: 1 / -1;
+			}
+			
+			.dialogGroupTitle {
+				text-align: center;
+				font-size: 1.2em;
+			}
+			
+			.dialogText {
+				border: 1px solid black;
+				margin: 0.5em auto;
+				padding: 0.5em;
+			}
+			
+			label:has(input:disabled) {
+				opacity: 0.5;
+				pointer-events: none;
+				cursor: not-allowed;
+			}
+		</style>
+	</head>
+	
+	<body>
+		
+		<div class="chooseOption" id="selectCategory">
+			<label><input type="radio" name="unit_category" value="Monster" onchange="changeCategory()" checked>角色</label>
+			<label><input type="radio" name="unit_category" value="Weapon" onchange="changeCategory()">武器</label>
+			<label><input type="radio" name="unit_category" value="Equipment" onchange="changeCategory()">飾品</label>
+		</div>
+		
+		<div id="filterRarity">
+			<div class="toggleAll" onclick="toggleAllCheckboxes(this)"></div>
+			<div class="chooseOption">
+				<label><input type="checkbox" value="N" onchange="setSelectableList(this)" checked>N</label>
+				<label><input type="checkbox" value="R" onchange="setSelectableList(this)" checked>R</label>
+				<label><input type="checkbox" value="SR" onchange="setSelectableList(this)" checked>SR</label>
+				<label><input type="checkbox" value="SSR" onchange="setSelectableList(this)" checked>SSR</label>
+			</div>
+		</div>
+		
+		<div id="filterStars">
+			<div class="toggleAll" onclick="toggleAllCheckboxes(this)"></div>
+			<div class="chooseOption">
+				<label><input type="checkbox" value="0" onchange="setSelectableList(this)" checked>0★</label>
+				<label><input type="checkbox" value="1" onchange="setSelectableList(this)" checked>1★</label>
+				<label><input type="checkbox" value="2" onchange="setSelectableList(this)" checked>2★</label>
+				<label><input type="checkbox" value="3" onchange="setSelectableList(this)" checked>3★</label>
+				<label><input type="checkbox" value="4" onchange="setSelectableList(this)" checked>4★</label>
+				<label><input type="checkbox" value="5" onchange="setSelectableList(this)" checked>5★</label>
+				<label><input type="checkbox" value="6" onchange="setSelectableList(this)" checked>6★</label>
+			</div>
+		</div>
+		
+		<div id="filterElement" class="mo">
+			<div class="toggleAll" onclick="toggleAllCheckboxes(this)"></div>
+			<div class="chooseOption">
+				<label><input type="checkbox" value="Fire" onchange="setSelectableList(this)" checked>火</label>
+				<label><input type="checkbox" value="Water" onchange="setSelectableList(this)" checked>水</label>
+				<label><input type="checkbox" value="Earth" onchange="setSelectableList(this)" checked>地</label>
+				<label><input type="checkbox" value="Air" onchange="setSelectableList(this)" checked>雷</label>
+				<label><input type="checkbox" value="Life" onchange="setSelectableList(this)" checked>光</label>
+				<label><input type="checkbox" value="Death" onchange="setSelectableList(this)" checked>闇</label>
+			</div>
+		</div>
+		
+		<div id="filterWeaponType" class="wo" style="display: none;">
+			<div class="toggleAll" onclick="toggleAllCheckboxes(this)"></div>
+			<div class="chooseOption" id="filterWeaponTypeYellow">
+				<label><input type="checkbox" value="Sword" onchange="setSelectableList(this)" checked>單手劍</label>
+				<label><input type="checkbox" value="Axe" onchange="setSelectableList(this)" checked>單手斧</label>
+				<label><input type="checkbox" value="Staff" onchange="setSelectableList(this)" checked>法杖</label>
+				<label><input type="checkbox" value="Mace" onchange="setSelectableList(this)" checked>釘頭鎚</label>
+			</div>
+			
+			<div class="chooseOption" id="filterWeaponTypeRed">
+				<label><input type="checkbox" value="GreatSword" onchange="setSelectableList(this)" checked>雙手劍</label>
+				<label><input type="checkbox" value="GreatAxe" onchange="setSelectableList(this)" checked>雙手斧</label>
+				<label><input type="checkbox" value="Spear" onchange="setSelectableList(this)" checked>長槍</label>
+				<label><input type="checkbox" value="Hammer" onchange="setSelectableList(this)" checked>大槌</label>
+				<label><input type="checkbox" value="Katana" onchange="setSelectableList(this)" checked>武士刀</label>
+			</div>
+		</div>
+		
+		<select id="targetSelect" onchange="displayData()">
+			<option value="" disabled selected hidden>▼ 選擇目標 ▼</option>
+		</select>
+		
+		
+		<hr style="margin-top: 1em;">
+		<div id="nameDisplay">
+			<div id="subName"></div>
+			<div id="bigName"></div>
+			<div id="codeName"></div>
+		</div>
+		
+		<div id="viewContent">
+			<div class="hidden" id="generalStatsArea">
+				<div class="infoRow hidden" id="rarity">
+					<div class="infoTitle">稀有度</div>
+					<div class="infoValue"></div>
+				</div>
+				<div class="infoRow hidden" id="stars">
+					<div class="infoTitle">星數</div>
+					<div class="infoValue"></div>
+				</div>
+				<div class="infoRow hidden" id="preferredWeapon">
+					<div class="infoTitle">擅長武器</div>
+					<div class="infoValue"></div>
+				</div>
+				<div class="infoRow hidden" id="weaponType">
+					<div class="infoTitle">武器類型</div>
+					<div class="infoValue"></div>
+				</div>
+				<div class="infoRow hidden" id="element">
+					<div class="infoTitle">屬性</div>
+					<div class="infoValue"></div>
+				</div>
+				<div class="infoRow hidden" id="cost">
+					<div class="infoTitle" style="text-align: center; text-align-last: center;">Cost</div>
+					<div class="infoValue"></div>
+				</div>
+				<div class="infoRow hidden" id="atk">
+					<div class="infoTitle">攻擊力</div>
+					<div class="infoValue"></div>
+				</div>
+				<div class="infoRow hidden" id="hp">
+					<div class="infoTitle">生命</div>
+					<div class="infoValue"></div>
+				</div>
+				<div class="infoRow hidden" id="speed">
+					<div class="infoTitle">速度</div>
+					<div class="infoValue"></div>
+				</div>
+				<div class="infoRow hidden" id="power">
+					<div class="infoTitle">
+						<div>戰力</div>
+						<div id="powerHint" style="text-align: center; text-align-last: center; font-size: 0.7em;">(基礎能力值估算)</div>
+					</div>
+					<div class="infoValue"></div>
+				</div>
+				<div class="infoRow hidden" id="freeEvo">
+					<div class="infoTitle">自動進化</div>
+					<div class="infoValue"></div>
+				</div>
+				<div class="infoRow hidden" id="visible">
+					<div class="infoTitle">圖鑑可見</div>
+					<div class="infoValue"></div>
+				</div>
+			</div>
+			
+			<div class="hidden" id="profileArea">
+				<hr>
+				<div class="areaTitle" id="profileTitle">簡介</div>
+				<div id="profileContent">
+					<div id="profileText"></div>
+				</div>
+			</div>
+			
+			<div class="hidden" id="leaderSkillArea">
+				<hr>
+				<div class="areaTitle" id="leaderSkillTitle">隊長技能</div>
+				<div id="leaderSkillContent">
+					<div id="leaderSkillName"></div>
+					<div id="leaderSkillDecription"></div>
+				</div>
+			</div>
+			
+			<div class="hidden" id="weaponSkillArea">
+				<hr>
+				<div class="areaTitle" id="weaponSkillTitle">武器技能</div>
+				<div id="weaponSkillContent">
+					<div id="weaponSkillName"></div>
+					<div id="weaponSkillDecription"></div>
+				</div>
+			</div>
+			
+			<div class="hidden" id="activeSkillArea">
+				<hr>
+				<div class="areaTitle" id="activeSkillTitle">主動技能</div>
+				<div id="activeSkillContent"></div>
+			</div>
+			
+			<div class="hidden" id="passiveSkillArea">
+				<hr>
+				<div class="areaTitle" id="passiveSkillTitle">被動技能</div>
+				<div id="passiveSkillContent"></div>
+			</div>
+			
+			<div class="hidden" id="gachaIntroArea">
+				<hr>
+				<div class="areaTitle" id="profileTitle">召喚導言</div>
+				<div id="gachaIntroContent">
+					<div id="gachaIntroText" style="text-align: center;"></div>
+				</div>
+			</div>
+			
+			<div class="hidden" id="dialogArea">
+				<hr>
+				<div class="areaTitle" id="dialogTitle">對話</div>
+				<div id="dialogContent"></div>
+			</div>
+			
+			<div class="hidden" id="aiLogicArea">
+				<hr>
+				<div class="areaTitle" id="aiLogicTitle">AI邏輯</div>
+				<div id="aiLogicContent" style="white-space: pre-wrap;"></div>
+			</div>
+			
+		</div>
+		
+		
+		<template id="template-hasAscended">
+			<div id="hasAscended">
+				<div id="profileAscendedTitle">・超越・</div>
+				<div id="profileAscendedText"></div>
+			</div>
+		</template>
+		
+		<template id="template-activeSkill">
+			<div class="activeSkillDetail">
+				<div class="activeSkillName"></div>
+				<div class="activeSkillSpirit"></div>
+				<div class="activeSkillTU"></div>
+				<div class="activeSkillDecription"></div>
+			</div>
+		</template>
+		
+		<template id="template-passiveSkill">
+			<div class="passiveSkillDetail">
+				<div class="passiveSkillName"></div>
+				<div></div>
+				<div></div>
+				<div class="passiveSkillDecription"></div>
+			</div>
+		</template>
+		
+		<template id="template-dialog">
+			<div class="dialogGroup">
+				<div class="dialogGroupTitle"></div>
+				<div class="dialogText"></div>
+			</div>
+		</template>
+		
+				
+		<script>
+			let unit_category = "Monster";
+			const initSelectOptionContent = document.getElementById("targetSelect").innerHTML;
+			const dataUrls = {
+				Monster: "https://evertale-playertw.github.io/Collection/Cht/Monster.json",
+				Weapon: "https://evertale-playertw.github.io/Collection/Cht/Weapon.json",
+				Equipment: "https://evertale-playertw.github.io/Collection/Cht/Accessory.json"
+			};
+			const wholeData = {};
+			
+			document.addEventListener("DOMContentLoaded", loadWholeData());
+			
+			function changeCategory() {
+				unit_category = document.querySelector('input[name="unit_category"]:checked').value;
+				
+				document.querySelectorAll(".mo, .wo").forEach(function(el) {
+					el.style.display = "none";
+				});
+				
+				if (unit_category === "Equipment") {
+					
+				} else {
+					if (unit_category === "Weapon") {
+						document.querySelectorAll(".wo").forEach(function(el) {
+							el.style.display = "";
+						});
+					} else {
+						document.querySelectorAll(".mo").forEach(function(el) {
+							el.style.display = "";
+						});
+					}
+				}
+				
+				document.querySelectorAll('.chooseOption input[type="checkbox"]').forEach(el => el.checked = true);
+				
+				setSelectableList();
+			}
+			
+			
+			function setSelectableList(triggerElement) {
+				const targetSelect = document.getElementById("targetSelect");
+				targetSelect.innerHTML = initSelectOptionContent;
+				
+				const selectedRarities = Array.from(document.querySelectorAll("#filterRarity input:checked")).map(cb => cb.value);
+				const selectedStars = Array.from(document.querySelectorAll("#filterStars input:checked")).map(cb => cb.value);
+				const selectedElements = Array.from(document.querySelectorAll("#filterElement input:checked")).map(cb => cb.parentNode.textContent.trim());
+				const selectedWeaponTypes = Array.from(document.querySelectorAll("#filterWeaponType input:checked")).map(cb => cb.parentNode.textContent.trim());
+				
+				const filteredStars = new Set();
+				
+				for (const id in wholeData[unit_category]) {
+					const entry = wholeData[unit_category][id];
+					const option = document.createElement("option");
+					
+					if (!selectedRarities.includes(entry["稀有度"])) continue;
+					if (unit_category === "Monster" && !selectedElements.includes(entry["屬性"])) continue;
+					if (unit_category === "Weapon" && !selectedWeaponTypes.includes(entry["類型"])) continue;
+					
+					filteredStars.add(entry["目前星數"]);
+					if (!selectedStars.includes(String(entry["目前星數"]))) continue;
+					
+					
+					option.value = id;
+					option.text = getFullNameAddStars(id);
+					targetSelect.appendChild(option);
+				}
+				
+				//禁用沒有的星數選項
+				Array.from(document.querySelectorAll("#filterStars input")).forEach(cb => {
+					cb.disabled = false;
+					if (!filteredStars.has(Number(cb.value))) {
+						cb.checked = false;
+						cb.disabled = true;
+					}
+					//}
+				})
+				
+				//若非星數區塊觸發，且星數都未選，則全選
+				if (triggerElement && (!triggerElement.closest("#filterStars")) && (selectedStars.length === 0)) {
+					document.querySelectorAll("#filterStars input").forEach(cb => cb.checked = true);
+					setSelectableList();
+				}
+			}
+			
+			function toggleAllCheckboxes(toggleElement) {
+				const checkboxes = toggleElement.parentElement.querySelectorAll('input[type="checkbox"]');
+				//debugger;
+				// 檢查目前是否全選
+				const allChecked = Array.from(checkboxes).filter(cb => !cb.disabled).every(cb => cb.checked);
+				checkboxes.forEach(cb => cb.checked = !allChecked);
+				
+				setSelectableList();
+			}
+			
+			
+			
+			async function loadWholeData() {
+				for (const [key, url] of Object.entries(dataUrls)) {
+					try {
+						const rawText = await fetch(url).then(res => res.text());
+						const jsonData = JSON.parse(rawText.replace(/\\(?![\\\/bfnrtu"])/g, "\\\\"));
+						insertInfo(jsonData);
+						wholeData[key] = jsonData;
+					} catch (e) {
+						console.error(`讀取或解析 ${key} 時發生錯誤:`, e);
+					}
+				}
+				console.log(wholeData);
+				setSelectableList();
+				
+				analyzeUrlParams();
+			}
+			
+			function insertInfo(jsonData) {
+				for (const id in jsonData) {
+					
+					let fullName = jsonData[id]["名字"];
+					if (!fullName) {
+						fullName = id
+					};
+					if (jsonData[id]["副名"]) {
+						fullName += ` - ${jsonData[id]["副名"]}`;
+					}
+					jsonData[id]["完整名"] = fullName;
+					
+					if (jsonData[id]["星數"]) {
+						jsonData[id]["目前星數"] = jsonData[id]["星數"].split("★").length - 1;
+						jsonData[id]["最大星數"] = jsonData[id]["星數"].length;
+					} else {
+						jsonData[id]["目前星數"] = 0;
+						jsonData[id]["最大星數"] = 0;
+					}
+				}
+			}
+			
+			
+			function displayData(id) {
+				if (!id) {id = document.getElementById("targetSelect").value;}
+				console.log(id);
+				if (id == "") return;
+				
+				document.getElementById("codeName").textContent = id;
+				document.getElementById("bigName").textContent = wholeData[unit_category][id]["名字"];
+				if (wholeData[unit_category][id]["副名"]) {
+					document.getElementById("subName").classList.remove("hidden");
+					document.getElementById("subName").textContent = wholeData[unit_category][id]["副名"];
+				} else {
+					document.getElementById("subName").classList.add("hidden");
+				}
+				
+				
+				setGeneralStats(id);
+				setProfile(id);
+				setLeaderSkill(id);
+				setWeaponSkill(id)
+				setActiveSkill(id);
+				setPassiveSkill(id);
+				setGachaIntro(id);
+				setDialog(id);
+				setAiLogic(id);
+				
+				document.getElementById("nameDisplay").scrollIntoView();
+				//location.hash = "#nameDisplay";
+				//document.getElementById("viewContent2").innerHTML = JSON.stringify(wholeData[unit_category][id], null, 2);
+			}
+			
+			function setGeneralStats(id) {
+				document.getElementById("generalStatsArea").classList.remove("hidden");
+				
+				if (unit_category === "Equipment") {
+					document.querySelector("#atk .infoTitle").textContent = "攻擊力";
+					document.querySelector("#hp .infoTitle").textContent = "生命";
+					document.getElementById("powerHint").classList.add("hidden");
+				} else {
+					document.querySelector("#atk .infoTitle").textContent = "基礎攻擊力";
+					document.querySelector("#hp .infoTitle").textContent = "基礎生命";
+					document.getElementById("powerHint").classList.remove("hidden");
+				}
+				
+				if (wholeData[unit_category][id]["稀有度"] != null) {
+					document.getElementById("rarity").classList.remove("hidden");
+					document.querySelector("#rarity .infoValue").textContent = wholeData[unit_category][id]["稀有度"];
+				} else {
+					document.getElementById("rarity").classList.add("hidden");
+				}
+				
+				if (wholeData[unit_category][id]["星數"] != null) {
+					document.getElementById("stars").classList.remove("hidden");
+					document.querySelector("#stars .infoValue").textContent = wholeData[unit_category][id]["星數"];
+				} else {
+					document.getElementById("stars").classList.add("hidden");
+				}
+				
+				if (wholeData[unit_category][id]["擅長武器"] != null) {
+					document.getElementById("preferredWeapon").classList.remove("hidden");
+					document.querySelector("#preferredWeapon .infoValue").textContent = wholeData[unit_category][id]["擅長武器"];
+				} else {
+					document.getElementById("preferredWeapon").classList.add("hidden");
+				}
+				
+				if (wholeData[unit_category][id]["類型"] != null) {
+					document.getElementById("weaponType").classList.remove("hidden");
+					document.querySelector("#weaponType .infoValue").textContent = wholeData[unit_category][id]["類型"];
+				} else {
+					document.getElementById("weaponType").classList.add("hidden");
+				}
+				
+				if (wholeData[unit_category][id]["屬性"] != null) {
+					document.getElementById("element").classList.remove("hidden");
+					document.querySelector("#element .infoValue").textContent = wholeData[unit_category][id]["屬性"];
+				} else {
+					document.getElementById("element").classList.add("hidden");
+				}
+				if (wholeData[unit_category][id]["Cost"] != null) {
+					document.getElementById("cost").classList.remove("hidden");
+					document.querySelector("#cost .infoValue").textContent = wholeData[unit_category][id]["Cost"];
+				} else {
+					document.getElementById("cost").classList.add("hidden");
+				}
+				
+				if (wholeData[unit_category][id]["基礎攻擊力"] != null | wholeData[unit_category][id]["攻擊力"] != null) {
+					document.getElementById("atk").classList.remove("hidden");
+					document.querySelector("#atk .infoValue").textContent = wholeData[unit_category][id]["基礎攻擊力"] ?? wholeData[unit_category][id]["攻擊力"];
+				} else {
+					document.getElementById("atk").classList.add("hidden");
+				}
+				
+				if (wholeData[unit_category][id]["基礎生命"] != null | wholeData[unit_category][id]["生命"] != null) {
+					document.getElementById("hp").classList.remove("hidden");
+					document.querySelector("#hp .infoValue").textContent = wholeData[unit_category][id]["基礎生命"] ?? wholeData[unit_category][id]["生命"];
+				} else {
+					document.getElementById("hp").classList.add("hidden");
+				}
+				
+				if (wholeData[unit_category][id]["速度"] != null) {
+					document.getElementById("speed").classList.remove("hidden");
+					document.querySelector("#speed .infoValue").textContent = wholeData[unit_category][id]["速度"];
+				} else {
+					document.getElementById("speed").classList.add("hidden");
+				}
+				
+				if (wholeData[unit_category][id]["戰力"] != null) {
+					document.getElementById("power").classList.remove("hidden");
+					document.querySelector("#power .infoValue").textContent = wholeData[unit_category][id]["戰力"];
+				} else {
+					document.getElementById("power").classList.add("hidden");
+				}
+				
+				if (wholeData[unit_category][id]["自動進化"] != null) {
+					document.getElementById("freeEvo").classList.remove("hidden");
+					const evoLv =  `Lv.${wholeData[unit_category][id]["自動進化"]["進化等級"]}`
+					const evoTargetLink = `?id=${wholeData[unit_category][id]["自動進化"]["進化目標"]}&category=Monster`
+					const evoTargetName = getFullNameAddStars(wholeData[unit_category][id]["自動進化"]["進化目標"])
+					const evoTarget = `<a href="${evoTargetLink}">${evoTargetName}</a>`
+					document.querySelector("#freeEvo .infoValue").innerHTML = `${evoLv}<br>${evoTarget}`;
+				} else {
+					document.getElementById("freeEvo").classList.add("hidden");
+				}
+				
+				if (wholeData[unit_category][id]["圖鑑可見"]) {
+					document.getElementById("visible").classList.remove("hidden");
+					document.querySelector("#visible .infoValue").textContent = "✔";
+				} else {
+					document.getElementById("visible").classList.remove("hidden");
+					document.querySelector("#visible .infoValue").textContent = "✗";
+				}
+			}
+			
+			function setProfile(id) {
+				if (wholeData[unit_category][id]["簡介"]) {
+					document.getElementById("profileArea").classList.remove("hidden");
+					document.getElementById("profileText").innerText = wholeData[unit_category][id]["簡介"];
+					
+					document.getElementById("hasAscended")?.remove();
+					if (wholeData[unit_category][id]["簡介_已超越(滿覺)"] != null) {
+						const templateHasAscended = document.getElementById("template-hasAscended").content.cloneNode(true);
+						templateHasAscended.getElementById("profileAscendedText").innerText = wholeData[unit_category][id]["簡介_已超越(滿覺)"];
+						document.getElementById("profileContent").appendChild(templateHasAscended);
+					}
+				} else {
+					document.getElementById("profileArea").classList.add("hidden");
+				}
+			}
+			
+			function setLeaderSkill(id) {
+				if (wholeData[unit_category][id]["隊長技能"]) {
+					document.getElementById("leaderSkillArea").classList.remove("hidden");
+					document.getElementById("leaderSkillName").innerText = wholeData[unit_category][id]["隊長技能"]["技能標題"];
+					document.getElementById("leaderSkillDecription").innerText = wholeData[unit_category][id]["隊長技能"]["技能敘述"];
+				} else {
+					document.getElementById("leaderSkillArea").classList.add("hidden");
+				}
+			}
+			
+			function setWeaponSkill(id) {
+				if (wholeData[unit_category][id]["武器技能"]) {
+					document.getElementById("weaponSkillArea").classList.remove("hidden");
+					document.getElementById("weaponSkillName").innerText = wholeData[unit_category][id]["武器技能"][0]["技能標題"];
+					document.getElementById("weaponSkillDecription").innerText = wholeData[unit_category][id]["武器技能"][0]["技能敘述"];
+				} else {
+					document.getElementById("weaponSkillArea").classList.add("hidden");
+				}
+			}
+			
+			function setActiveSkill(id) {
+				if (wholeData[unit_category][id]["主動技能"]) {
+					document.getElementById("activeSkillArea").classList.remove("hidden");
+					document.getElementById("activeSkillContent").innerHTML = "";
+					
+					for (const [index, mySkill] of wholeData[unit_category][id]["主動技能"].entries()) {
+						const templateActiveSkill = document.getElementById("template-activeSkill").content.cloneNode(true);
+						templateActiveSkill.querySelector(".activeSkillDetail").id = "activeSkill_" + (index + 1);
+						templateActiveSkill.querySelector(".activeSkillName").innerText = mySkill["技能標題"];
+						templateActiveSkill.querySelector(".activeSkillSpirit").innerText = "靈氣 " + mySkill["靈氣"];
+						templateActiveSkill.querySelector(".activeSkillTU").innerText = mySkill["TU"] + " TU";
+						templateActiveSkill.querySelector(".activeSkillDecription").innerText = mySkill["技能敘述"];
+						
+						document.getElementById("activeSkillContent").appendChild(templateActiveSkill);
+					}
+				} else {
+					document.getElementById("activeSkillArea").classList.add("hidden");
+				}
+			}
+			
+			function setPassiveSkill(id) {
+				if (wholeData[unit_category][id]["被動技能"]) {
+					document.getElementById("passiveSkillArea").classList.remove("hidden");
+					document.getElementById("passiveSkillContent").innerHTML = "";
+					
+					for (const [index, mySkill] of wholeData[unit_category][id]["被動技能"].entries()) {
+						const templateActiveSkill = document.getElementById("template-passiveSkill").content.cloneNode(true);
+						templateActiveSkill.querySelector(".passiveSkillDetail").id = "passiveSkill_" + (index + 1);
+						templateActiveSkill.querySelector(".passiveSkillName").innerText = mySkill["技能標題"];
+						templateActiveSkill.querySelector(".passiveSkillDecription").innerText = mySkill["技能敘述"];
+						
+						document.getElementById("passiveSkillContent").appendChild(templateActiveSkill);
+					}
+				} else {
+					document.getElementById("passiveSkillArea").classList.add("hidden");
+				}
+			}
+			
+			function setGachaIntro(id) {
+				if (wholeData[unit_category][id]["召喚導言"]) {
+					document.getElementById("gachaIntroArea").classList.remove("hidden");
+					document.getElementById("gachaIntroText").innerText = wholeData[unit_category][id]["召喚導言"];
+				} else {
+					document.getElementById("gachaIntroArea").classList.add("hidden");
+				}
+			}
+			
+			function setDialog(id) {
+				if (wholeData[unit_category][id]["對話"]) {
+					document.getElementById("dialogArea").classList.remove("hidden");
+					document.getElementById("dialogContent").innerHTML = "";
+					
+					const dailogSort = {
+						Gacha: "召喚",
+						Login: "主畫面登入",
+						Tap: "主畫面點擊",
+						Idle: "主畫面閒置"
+					};
+					
+					for (const [key, title] of Object.entries(dailogSort)) {
+						if (!wholeData[unit_category][id]["對話"][title]) continue;
+						
+						const templateDialog = document.getElementById("template-dialog").content.cloneNode(true);
+						templateDialog.querySelector(".dialogGroup").id = "dialog_" + key
+						templateDialog.querySelector(".dialogGroupTitle").innerText = title;
+						
+						for (const dialogText of wholeData[unit_category][id]["對話"][title]) {
+							const templateDialogText = templateDialog.querySelector(".dialogText").cloneNode(true);
+							templateDialogText.innerText = dialogText;
+							templateDialog.querySelector(".dialogGroup").appendChild(templateDialogText);
+						}
+						
+						templateDialog.querySelector(".dialogText").remove();
+						document.getElementById("dialogContent").appendChild(templateDialog);
+					}
+				} else {
+					document.getElementById("dialogArea").classList.add("hidden");
+				}
+			}
+			
+			function setAiLogic(id) {
+				if (wholeData[unit_category][id]["AI邏輯"]) {
+					document.getElementById("aiLogicArea").classList.remove("hidden");
+					//刪除最外層的{}，並統一減少1縮排
+					let jsonText = JSON.stringify(wholeData[unit_category][id]["AI邏輯"], null, "\t");
+					jsonText = jsonText.split("\n").slice(1, -1);
+					jsonText = jsonText.map(line => line.replace(/^\t/, ''));
+					jsonText = jsonText.join("\n")
+
+					document.getElementById("aiLogicContent").innerText = jsonText;
+				} else {
+					document.getElementById("aiLogicArea").classList.add("hidden");
+				}
+			}
+			
+			function getFullNameAddStars(id) {
+				let longName = wholeData[unit_category][id]["完整名"];
+				longName += ` (${wholeData[unit_category][id]["星數"]})`
+				return longName;
+			}
+			
+			function  analyzeUrlParams() {
+				try  {
+					const params = new URLSearchParams(window.location.search);
+					
+					if (!params.toString()) return;
+					const id = params.get("id") ?? (() => { throw new Error("id參數不可少"); })();
+					
+					let category = params.get("category") ?? (() => {
+						for (const [type, ids] of Object.entries(wholeData)) {
+							if (id in ids) return type;
+						}
+						throw new Error("id參數錯誤");
+					})();
+										
+					if (wholeData[category][id]) {
+						unit_category = category;
+						displayData(id);
+						unit_category = document.querySelector('input[name="unit_category"]:checked').value;
+					} else {
+						throw new Error("id或category參數錯誤");
+					}
+				} catch (e) {
+					alert(e);
+					console.error(e);
+				}
+			}
+			
+			
+			
+			
+			
+			
+		</script>
+	</body>
+	
+</html>
