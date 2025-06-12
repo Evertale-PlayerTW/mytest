@@ -4,21 +4,21 @@
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>JS測試</title>
+		<title>「亙苦妄想」花名冊</title>
 		<style>
 			body {
 				width: min(100%, 800px);
 				margin: auto;
 				padding: 0.5rem;
 				box-sizing: border-box;
-				font-family: "Noto Sans TC",  "Microsoft JhengHei", "PingFang TC", "Segoe UI", Arial, sans-serif;
+				font-family: "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", "Segoe UI", Arial, sans-serif;
 			}
 			
 			a {
 				color: inherit;
 				text-decoration: none;
 			}
-
+			
 			.chooseOption {
 				display: flex;
 				align-items: center;
@@ -104,7 +104,7 @@
 			#nameDisplay {
 				position: relative;
 			}
-						
+			
 			#bigName {
 				text-align: center;
 				font-size: 3em;
@@ -165,6 +165,7 @@
 			#weaponSkillContent,
 			#activeSkillContent,
 			#passiveSkillContent,
+			#summonableMonstersContent,
 			#gachaIntroContent,
 			#dialogContent,
 			#aiLogicContent {
@@ -382,6 +383,14 @@
 				</div>
 			</div>
 			
+			<div class="hidden" id="gachaIntroArea">
+				<hr>
+				<div class="areaTitle" id="profileTitle">召喚導言</div>
+				<div id="gachaIntroContent">
+					<div id="gachaIntroText" style="text-align: center;"></div>
+				</div>
+			</div>
+			
 			<div class="hidden" id="profileArea">
 				<hr>
 				<div class="areaTitle" id="profileTitle">簡介</div>
@@ -420,11 +429,10 @@
 				<div id="passiveSkillContent"></div>
 			</div>
 			
-			<div class="hidden" id="gachaIntroArea">
+			<div class="hidden" id="summonableMonstersArea">
 				<hr>
-				<div class="areaTitle" id="profileTitle">召喚導言</div>
-				<div id="gachaIntroContent">
-					<div id="gachaIntroText" style="text-align: center;"></div>
+				<div class="areaTitle" id="summonableMonstersTitle">召喚物</div>
+				<div id="summonableMonstersContent">
 				</div>
 			</div>
 			
@@ -475,10 +483,11 @@
 			</div>
 		</template>
 		
-				
+		
 		<script>
 			let unit_category = "Monster";
 			const initSelectOptionContent = document.getElementById("targetSelect").innerHTML;
+			const initTitle = document.title;
 			const dataUrls = {
 				Monster: "https://evertale-playertw.github.io/Collection/Cht/Monster.json",
 				Weapon: "https://evertale-playertw.github.io/Collection/Cht/Weapon.json",
@@ -592,10 +601,8 @@
 			function insertInfo(jsonData) {
 				for (const id in jsonData) {
 					
-					let fullName = jsonData[id]["名字"];
-					if (!fullName) {
-						fullName = id
-					};
+					let fullName = jsonData[id]["名字"] || id;
+					
 					if (jsonData[id]["副名"]) {
 						fullName += ` - ${jsonData[id]["副名"]}`;
 					}
@@ -613,12 +620,16 @@
 			
 			
 			function displayData(id) {
-				if (!id) {id = document.getElementById("targetSelect").value;}
+				if (!id) {
+					id = document.getElementById("targetSelect").value;
+				}
 				console.log(id);
 				if (id == "") return;
 				
+				document.title = `${wholeData[unit_category][id]["完整名"]} | ${initTitle}`;
+				
 				document.getElementById("codeName").textContent = id;
-				document.getElementById("bigName").textContent = wholeData[unit_category][id]["名字"];
+				document.getElementById("bigName").textContent = wholeData[unit_category][id]["名字"] || id;
 				if (wholeData[unit_category][id]["副名"]) {
 					document.getElementById("subName").classList.remove("hidden");
 					document.getElementById("subName").textContent = wholeData[unit_category][id]["副名"];
@@ -633,13 +644,12 @@
 				setWeaponSkill(id)
 				setActiveSkill(id);
 				setPassiveSkill(id);
+				setSummonableMonsters(id);
 				setGachaIntro(id);
 				setDialog(id);
 				setAiLogic(id);
 				
 				document.getElementById("nameDisplay").scrollIntoView();
-				//location.hash = "#nameDisplay";
-				//document.getElementById("viewContent2").innerHTML = JSON.stringify(wholeData[unit_category][id], null, 2);
 			}
 			
 			function setGeneralStats(id) {
@@ -726,11 +736,9 @@
 				
 				if (wholeData[unit_category][id]["自動進化"] != null) {
 					document.getElementById("freeEvo").classList.remove("hidden");
-					const evoLv =  `Lv.${wholeData[unit_category][id]["自動進化"]["進化等級"]}`
-					const evoTargetLink = `?id=${wholeData[unit_category][id]["自動進化"]["進化目標"]}&category=Monster`
-					const evoTargetName = getFullNameAddStars(wholeData[unit_category][id]["自動進化"]["進化目標"])
-					const evoTarget = `<a href="${evoTargetLink}">${evoTargetName}</a>`
-					document.querySelector("#freeEvo .infoValue").innerHTML = `${evoLv}<br>${evoTarget}`;
+					const evoLv = `Lv.${wholeData[unit_category][id]["自動進化"]["進化等級"]}`
+					const evoTarget = setNameAndLink(wholeData[unit_category][id]["自動進化"]["進化目標"], "Monster")
+					document.querySelector("#freeEvo .infoValue").innerHTML = `${evoLv}<br>${evoTarget.outerHTML}`;
 				} else {
 					document.getElementById("freeEvo").classList.add("hidden");
 				}
@@ -847,10 +855,13 @@
 						templateDialog.querySelector(".dialogGroupTitle").innerText = title;
 						
 						for (const dialogText of wholeData[unit_category][id]["對話"][title]) {
+							if (!dialogText) continue;
 							const templateDialogText = templateDialog.querySelector(".dialogText").cloneNode(true);
 							templateDialogText.innerText = dialogText;
 							templateDialog.querySelector(".dialogGroup").appendChild(templateDialogText);
 						}
+						//若無添加，則只有模板當初的2子元素
+						if (templateDialog.querySelector(".dialogGroup").children.length <= 2) continue;
 						
 						templateDialog.querySelector(".dialogText").remove();
 						document.getElementById("dialogContent").appendChild(templateDialog);
@@ -868,7 +879,7 @@
 					jsonText = jsonText.split("\n").slice(1, -1);
 					jsonText = jsonText.map(line => line.replace(/^\t/, ''));
 					jsonText = jsonText.join("\n")
-
+					
 					document.getElementById("aiLogicContent").innerText = jsonText;
 				} else {
 					document.getElementById("aiLogicArea").classList.add("hidden");
@@ -881,12 +892,14 @@
 				return longName;
 			}
 			
-			function  analyzeUrlParams() {
-				try  {
+			function analyzeUrlParams() {
+				try {
 					const params = new URLSearchParams(window.location.search);
 					
 					if (!params.toString()) return;
-					const id = params.get("id") ?? (() => { throw new Error("id參數不可少"); })();
+					const id = params.get("id") ?? (() => {
+						throw new Error("id參數不可少");
+					})();
 					
 					let category = params.get("category") ?? (() => {
 						for (const [type, ids] of Object.entries(wholeData)) {
@@ -894,7 +907,7 @@
 						}
 						throw new Error("id參數錯誤");
 					})();
-										
+					
 					if (wholeData[category][id]) {
 						unit_category = category;
 						displayData(id);
@@ -908,10 +921,22 @@
 				}
 			}
 			
+			function setNameAndLink(id, category) {
+				const linkElement = document.createElement("a");
+				linkElement.href =  `?id=${id}&category=${category}`;
+				linkElement.textContent = getFullNameAddStars(id)
+				return linkElement;
+			}
 			
-			
-			
-			
+			function setSummonableMonsters(id) {
+				if (wholeData[unit_category][id]["召喚物"]) {
+					document.getElementById("summonableMonstersArea").classList.remove("hidden");
+					const combination = wholeData[unit_category][id]["召喚物"].map(conjureID => setNameAndLink(conjureID, "Monster").outerHTML).join("<br>");
+					document.getElementById("summonableMonstersContent").innerHTML = combination;
+				} else {
+					document.getElementById("summonableMonstersArea").classList.add("hidden");
+				}
+			}
 			
 		</script>
 	</body>
