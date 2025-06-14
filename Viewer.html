@@ -168,7 +168,8 @@
 			#summonableMonstersContent,
 			#gachaIntroContent,
 			#dialogContent,
-			#aiLogicContent {
+			#aiLogicContent,
+			#relationshipContent {
 				border: 1px solid black;
 				padding: 0.5em;
 			}
@@ -196,7 +197,8 @@
 			
 			#activeSkillContent,
 			#passiveSkillContent,
-			#dialogContent {
+			#dialogContent,
+			#relationshipContent {
 				display: flex;
 				flex-direction: column;
 				gap: 0.5em;
@@ -213,7 +215,8 @@
 			}
 			
 			.activeSkillName,
-			.passiveSkillName {
+			.passiveSkillName,
+			.relationshipName {
 				display: inline-block;
 				margin-left: 1em;
 				border: 1px solid black;
@@ -232,7 +235,8 @@
 			}
 			
 			.activeSkillDecription,
-			.passiveSkillDecription {
+			.passiveSkillDecription,
+			.relationshipMembers {
 				grid-column: 1 / -1;
 			}
 			
@@ -252,6 +256,30 @@
 				pointer-events: none;
 				cursor: not-allowed;
 			}
+			
+			.relationshipAGroup {
+				display: grid;
+				grid-template-columns: 1fr 5em;
+				align-items: center;
+				border: 1px solid black;
+				padding: 0.5em;
+			}			
+			
+			.relationshipBonus {
+				text-align: center;
+				border: 1px solid black;
+				border-radius: 5em;
+				height: 100%;
+				place-content: center;
+				padding: 0 0.5em;
+				line-height: 1.1;
+			}
+			
+			.relationshipAGroup ul {
+				margin: 0 1em;
+				padding-left: 0.5em;
+			}
+			
 		</style>
 	</head>
 	
@@ -448,6 +476,12 @@
 				<div id="aiLogicContent" style="white-space: pre-wrap;"></div>
 			</div>
 			
+			<div class="hidden" id="relationshipArea">
+				<hr>
+				<div class="areaTitle" id="relationshipTitle">夥伴</div>
+				<div id="relationshipContent"></div>
+			</div>
+			
 		</div>
 		
 		
@@ -483,6 +517,13 @@
 			</div>
 		</template>
 		
+		<template id="template-relationship">
+					<div class="relationshipAGroup">
+						<div class="relationshipName"></div>
+						<div class="relationshipBonus"></div>
+						<div class="relationshipMembers"></div>
+					</div>
+		</template>
 		
 		<script>
 			let unit_category = "Monster";
@@ -548,7 +589,7 @@
 					
 					
 					option.value = id;
-					option.text = getFullNameAddStars(id);
+					option.text = getFullNameAddStarsOrRarity(id, true, false);
 					targetSelect.appendChild(option);
 				}
 				
@@ -648,6 +689,7 @@
 				setGachaIntro(id);
 				setDialog(id);
 				setAiLogic(id);
+				setRelationship(id);
 				
 				document.getElementById("nameDisplay").scrollIntoView();
 			}
@@ -737,7 +779,7 @@
 				if (wholeData[unit_category][id]["自動進化"] != null) {
 					document.getElementById("freeEvo").classList.remove("hidden");
 					const evoLv = `Lv.${wholeData[unit_category][id]["自動進化"]["進化等級"]}`
-					const evoTarget = setNameAndLink(wholeData[unit_category][id]["自動進化"]["進化目標"], "Monster")
+					const evoTarget = setNameAndLink(wholeData[unit_category][id]["自動進化"]["進化目標"], "Monster", true, false);
 					document.querySelector("#freeEvo .infoValue").innerHTML = `${evoLv}<br>${evoTarget.outerHTML}`;
 				} else {
 					document.getElementById("freeEvo").classList.add("hidden");
@@ -886,12 +928,13 @@
 				}
 			}
 			
-			function getFullNameAddStars(id) {
+			function getFullNameAddStarsOrRarity(id, addStars = true, addRarity = false) {
 				let longName = wholeData[unit_category][id]["完整名"];
-				longName += ` (${wholeData[unit_category][id]["星數"]})`
+				if (addStars) longName += ` (${wholeData[unit_category][id]["星數"]})`;				
+				if (addRarity) longName += ` (${wholeData[unit_category][id]["稀有度"]})`;
 				return longName;
 			}
-			
+						
 			function analyzeUrlParams() {
 				try {
 					const params = new URLSearchParams(window.location.search);
@@ -921,23 +964,47 @@
 				}
 			}
 			
-			function setNameAndLink(id, category) {
+			function setNameAndLink(id, category, addStars = true, addRarity = false) {
 				const linkElement = document.createElement("a");
 				linkElement.href =  `?id=${id}&category=${category}`;
-				linkElement.textContent = getFullNameAddStars(id)
+				linkElement.textContent = getFullNameAddStarsOrRarity(id, addStars, addRarity);
 				return linkElement;
 			}
 			
 			function setSummonableMonsters(id) {
 				if (wholeData[unit_category][id]["召喚物"]) {
 					document.getElementById("summonableMonstersArea").classList.remove("hidden");
-					const combination = wholeData[unit_category][id]["召喚物"].map(conjureID => setNameAndLink(conjureID, "Monster").outerHTML).join("<br>");
+					const combination = wholeData[unit_category][id]["召喚物"].map(conjureID => setNameAndLink(conjureID, "Monster", true, false).outerHTML).join("<br>");
 					document.getElementById("summonableMonstersContent").innerHTML = combination;
 				} else {
 					document.getElementById("summonableMonstersArea").classList.add("hidden");
 				}
 			}
 			
+			function setRelationship(id) {
+				if (wholeData[unit_category][id]["夥伴"]) {
+					document.getElementById("relationshipArea").classList.remove("hidden");
+					document.getElementById("relationshipContent").innerHTML = "";
+					
+					for (const oneRelationship of Object.values(wholeData[unit_category][id]["夥伴"])) {
+						const templateRelationship = document.getElementById("template-relationship").content.cloneNode(true);
+						templateRelationship.querySelector(".relationshipName").innerText = oneRelationship["夥伴關係"];
+						templateRelationship.querySelector(".relationshipBonus").innerText = oneRelationship["夥伴加成"].replace("+", "\n+");
+						
+						const memberlist = document.createElement("ul");
+						for (const charID of oneRelationship["夥伴成員"]) {
+							const listItem = document.createElement("li");
+							listItem.appendChild(setNameAndLink(charID, "Monster", false, true));
+							memberlist.appendChild(listItem);
+						}
+						templateRelationship.querySelector(".relationshipMembers").appendChild(memberlist);
+						
+						document.getElementById("relationshipContent").appendChild(templateRelationship);
+					}
+				} else {
+					document.getElementById("relationshipArea").classList.add("hidden");
+				}
+			}
 		</script>
 	</body>
 	
