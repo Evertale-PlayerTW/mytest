@@ -263,7 +263,7 @@
 				align-items: center;
 				border: 1px solid black;
 				padding: 0.5em;
-			}			
+			}
 			
 			.relationshipBonus {
 				text-align: center;
@@ -279,7 +279,6 @@
 				margin: 0 1em;
 				padding-left: 0.5em;
 			}
-			
 		</style>
 	</head>
 	
@@ -518,11 +517,11 @@
 		</template>
 		
 		<template id="template-relationship">
-					<div class="relationshipAGroup">
-						<div class="relationshipName"></div>
-						<div class="relationshipBonus"></div>
-						<div class="relationshipMembers"></div>
-					</div>
+			<div class="relationshipAGroup">
+				<div class="relationshipName"></div>
+				<div class="relationshipBonus"></div>
+				<div class="relationshipMembers"></div>
+			</div>
 		</template>
 		
 		<script>
@@ -593,26 +592,28 @@
 					targetSelect.appendChild(option);
 				}
 				
-				//禁用沒有的星數選項
-				Array.from(document.querySelectorAll("#filterStars input")).forEach(cb => {
-					cb.disabled = false;
-					if (!filteredStars.has(Number(cb.value))) {
-						cb.checked = false;
-						cb.disabled = true;
+				if (filteredStars.size !== 0) {
+					//禁用沒有的星數選項
+					Array.from(document.querySelectorAll("#filterStars input")).forEach(cb => {
+						cb.disabled = false;
+						if (!filteredStars.has(Number(cb.value))) {
+							cb.checked = false;
+							cb.disabled = true;
+						}
+					})
+					
+					//若非星數區塊觸發，且星數都未選，則全選
+					const selectedStarsNew = Array.from(document.querySelectorAll("#filterStars input:checked")).map(cb => cb.value);
+					if (triggerElement && (!triggerElement.closest("#filterStars")) && (selectedStarsNew.length === 0)) {
+						document.querySelectorAll("#filterStars input").forEach(cb => cb.checked = true);
+						setSelectableList();
 					}
-					//}
-				})
-				
-				//若非星數區塊觸發，且星數都未選，則全選
-				if (triggerElement && (!triggerElement.closest("#filterStars")) && (selectedStars.length === 0)) {
-					document.querySelectorAll("#filterStars input").forEach(cb => cb.checked = true);
-					setSelectableList();
 				}
 			}
 			
 			function toggleAllCheckboxes(toggleElement) {
 				const checkboxes = toggleElement.parentElement.querySelectorAll('input[type="checkbox"]');
-				//debugger;
+				
 				// 檢查目前是否全選
 				const allChecked = Array.from(checkboxes).filter(cb => !cb.disabled).every(cb => cb.checked);
 				checkboxes.forEach(cb => cb.checked = !allChecked);
@@ -633,7 +634,6 @@
 						console.error(`讀取或解析 ${key} 時發生錯誤:`, e);
 					}
 				}
-				console.log(wholeData);
 				setSelectableList();
 				
 				analyzeUrlParams();
@@ -664,7 +664,6 @@
 				if (!id) {
 					id = document.getElementById("targetSelect").value;
 				}
-				console.log(id);
 				if (id == "") return;
 				
 				document.title = `${wholeData[unit_category][id]["完整名"]} | ${initTitle}`;
@@ -930,11 +929,11 @@
 			
 			function getFullNameAddStarsOrRarity(id, addStars = true, addRarity = false) {
 				let longName = wholeData[unit_category][id]["完整名"];
-				if (addStars) longName += ` (${wholeData[unit_category][id]["星數"]})`;				
+				if (addStars) longName += ` (${wholeData[unit_category][id]["星數"]})`;
 				if (addRarity) longName += ` (${wholeData[unit_category][id]["稀有度"]})`;
 				return longName;
 			}
-						
+			
 			function analyzeUrlParams() {
 				try {
 					const params = new URLSearchParams(window.location.search);
@@ -966,7 +965,7 @@
 			
 			function setNameAndLink(id, category, addStars = true, addRarity = false) {
 				const linkElement = document.createElement("a");
-				linkElement.href =  `?id=${id}&category=${category}`;
+				linkElement.href = `?id=${id}&category=${category}`;
 				linkElement.textContent = getFullNameAddStarsOrRarity(id, addStars, addRarity);
 				return linkElement;
 			}
