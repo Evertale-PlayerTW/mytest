@@ -160,18 +160,10 @@
 				font-size: 2em;
 			}
 			
-			#profileContent,
-			#leaderSkillContent,
-			#weaponSkillContent,
-			#activeSkillContent,
-			#passiveSkillContent,
-			#summonableMonstersContent,
-			#gachaIntroContent,
-			#dialogContent,
-			#aiLogicContent,
-			#relationshipContent {
+			.contentBox {
 				border: 1px solid black;
 				padding: 0.5em;
+				min-height: 1em;
 			}
 			
 			#hasAscended {
@@ -279,6 +271,19 @@
 				margin: 0 1em;
 				padding-left: 0.5em;
 			}
+			
+			.contentBox {
+				position: relative;
+			}
+			
+			.collapseButton {
+				position: absolute;
+				left: 0em;
+				top: -1.5em;
+				background-color: transparent;
+				border: 0;
+			}
+			
 		</style>
 	</head>
 	
@@ -413,72 +418,101 @@
 			<div class="hidden" id="gachaIntroArea">
 				<hr>
 				<div class="areaTitle" id="profileTitle">召喚導言</div>
-				<div id="gachaIntroContent">
-					<div id="gachaIntroText" style="text-align: center;"></div>
+				<div class="contentBox">
+					<button class="collapseButton" onclick="collapseContent(this)">⊖</button>
+					<div id="gachaIntroContent">
+						<div id="gachaIntroText" style="text-align: center;"></div>
+					</div>
 				</div>
 			</div>
 			
 			<div class="hidden" id="profileArea">
 				<hr>
 				<div class="areaTitle" id="profileTitle">簡介</div>
-				<div id="profileContent">
-					<div id="profileText"></div>
+				<div class="contentBox">
+					<button class="collapseButton" onclick="collapseContent(this)">⊖</button>
+					<div id="profileContent">
+						<div id="profileText"></div>
+					</div>
 				</div>
 			</div>
 			
 			<div class="hidden" id="leaderSkillArea">
 				<hr>
 				<div class="areaTitle" id="leaderSkillTitle">隊長技能</div>
-				<div id="leaderSkillContent">
-					<div id="leaderSkillName"></div>
-					<div id="leaderSkillDecription"></div>
+				<div class="contentBox">
+					<button class="collapseButton" onclick="collapseContent(this)">⊖</button>
+					<div id="leaderSkillContent">
+						<div id="leaderSkillName"></div>
+						<div id="leaderSkillDecription"></div>
+					</div>
 				</div>
 			</div>
 			
 			<div class="hidden" id="weaponSkillArea">
 				<hr>
 				<div class="areaTitle" id="weaponSkillTitle">武器技能</div>
-				<div id="weaponSkillContent">
-					<div id="weaponSkillName"></div>
-					<div id="weaponSkillDecription"></div>
+				<div class="contentBox">
+					<button class="collapseButton" onclick="collapseContent(this)">⊖</button>
+					<div id="weaponSkillContent">
+						<div id="weaponSkillName"></div>
+						<div id="weaponSkillDecription"></div>
+					</div>
 				</div>
 			</div>
 			
 			<div class="hidden" id="activeSkillArea">
 				<hr>
 				<div class="areaTitle" id="activeSkillTitle">主動技能</div>
-				<div id="activeSkillContent"></div>
+				<div class="contentBox">
+					<button class="collapseButton" onclick="collapseContent(this)">⊖</button>
+					<div id="activeSkillContent"></div>
+				</div>
 			</div>
 			
 			<div class="hidden" id="passiveSkillArea">
 				<hr>
 				<div class="areaTitle" id="passiveSkillTitle">被動技能</div>
-				<div id="passiveSkillContent"></div>
+				<div class="contentBox">
+					<button class="collapseButton" onclick="collapseContent(this)">⊖</button>
+					<div id="passiveSkillContent"></div>
+				</div>
 			</div>
 			
 			<div class="hidden" id="summonableMonstersArea">
 				<hr>
 				<div class="areaTitle" id="summonableMonstersTitle">召喚物</div>
-				<div id="summonableMonstersContent">
+				<div class="contentBox">
+					<button class="collapseButton" onclick="collapseContent(this)">⊖</button>
+					<div id="summonableMonstersContent"></div>
 				</div>
 			</div>
 			
 			<div class="hidden" id="dialogArea">
 				<hr>
 				<div class="areaTitle" id="dialogTitle">對話</div>
-				<div id="dialogContent"></div>
+				<div class="contentBox">
+					<button class="collapseButton" onclick="collapseContent(this)">⊖</button>
+					<div id="dialogContent"></div>
+				</div>
 			</div>
 			
 			<div class="hidden" id="aiLogicArea">
 				<hr>
 				<div class="areaTitle" id="aiLogicTitle">AI邏輯</div>
-				<div id="aiLogicContent" style="white-space: pre-wrap;"></div>
+				<div class="contentBox">
+					<button class="collapseButton" onclick="collapseContent(this)">⊖</button>
+					<div id="aiLogicContent" style="white-space: pre-wrap;"></div>
+				</div>
 			</div>
 			
 			<div class="hidden" id="relationshipArea">
 				<hr>
 				<div class="areaTitle" id="relationshipTitle">夥伴</div>
-				<div id="relationshipContent"></div>
+				<div class="contentBox">
+					<button class="collapseButton" onclick="collapseContent(this)">⊖</button>
+					<div id="relationshipContent"></div>
+				</div>
 			</div>
 			
 		</div>
@@ -666,6 +700,7 @@
 				}
 				if (id == "") return;
 				
+				collapseReset();
 				document.title = `${wholeData[unit_category][id]["完整名"]} | ${initTitle}`;
 				
 				document.getElementById("codeName").textContent = id;
@@ -1003,6 +1038,17 @@
 				} else {
 					document.getElementById("relationshipArea").classList.add("hidden");
 				}
+			}
+			
+			function collapseContent(triggerElement) {
+				triggerElement.innerText = ! triggerElement.nextElementSibling.classList.contains("hidden") ? "⊕" : "⊖";
+				triggerElement.nextElementSibling.classList.toggle("hidden");
+			}
+			
+			function collapseReset() {
+				document.querySelectorAll(".collapseButton").forEach(function(el) {
+					el.nextElementSibling.classList.remove("hidden");
+				});
 			}
 		</script>
 	</body>
