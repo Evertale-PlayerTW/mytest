@@ -270,7 +270,7 @@
 			}
 			
 			.relationshipAGroup ul {
-				margin: 0 1em;
+				margin: 0.5em 1em;
 				padding-left: 0.5em;
 			}
 			
@@ -990,7 +990,7 @@
 						unit_category = category;
 						displayData(id);
 						unit_category = document.querySelector('input[name="unit_category"]:checked').value;
-						history.replaceState(null, null, window.location.pathname);
+						history.replaceState(null, "", window.location.pathname);
 					} else {
 						throw new Error("id或category參數錯誤");
 					}
