@@ -167,7 +167,7 @@
 				min-height: 1.5em;
 				box-sizing: border-box;
 			}
-						
+			
 			#hasAscended {
 				margin-top: 1.5em;
 			}
@@ -284,7 +284,6 @@
 				width: 2em;
 				height: 2em;
 			}
-			
 		</style>
 	</head>
 	
@@ -979,6 +978,7 @@
 						throw new Error("id參數不可少");
 					})();
 					
+					//若沒傳入category則遍歷搜尋
 					let category = params.get("category") ?? (() => {
 						for (const [type, ids] of Object.entries(wholeData)) {
 							if (id in ids) return type;
@@ -990,6 +990,7 @@
 						unit_category = category;
 						displayData(id);
 						unit_category = document.querySelector('input[name="unit_category"]:checked').value;
+						history.replaceState(null, null, window.location.pathname);
 					} else {
 						throw new Error("id或category參數錯誤");
 					}
@@ -1042,7 +1043,7 @@
 			}
 			
 			function collapseContent(triggerElement) {
-				triggerElement.innerText = ! triggerElement.nextElementSibling.classList.contains("hidden") ? "⊕" : "⊖";
+				triggerElement.innerText = !triggerElement.nextElementSibling.classList.contains("hidden") ? "⊕" : "⊖";
 				triggerElement.nextElementSibling.classList.toggle("hidden");
 			}
 			
