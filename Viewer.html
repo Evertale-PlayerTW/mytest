@@ -44,12 +44,24 @@
 			
 			.toggleAll {
 				position: absolute;
-				top: calc(50% - 0.6em);
+				top: 0;
 				left: -0.4em;
+				border: none;
+				background: transparent;
+				width: max(3%, 1em);;
+				height: 100%;
+			}
+			
+			.toggleAll::before {
+				position: absolute;
+				content: "";
+				top: 50%;
+				left: 0;
 				background-color: gray;
 				border-radius: 50%;
 				width: 0.8em;
 				height: 1.2em;
+				transform: translateY(-50%);
 			}
 			
 			#targetSelect {
@@ -298,7 +310,7 @@
 		</div>
 		
 		<div id="filterRarity">
-			<div class="toggleAll" onclick="toggleAllCheckboxes(this)"></div>
+			<button class="toggleAll" onclick="toggleAllCheckboxes(this)"></button>
 			<div class="chooseOption">
 				<label><input type="checkbox" value="N" onchange="setSelectableList(this)" checked>N</label>
 				<label><input type="checkbox" value="R" onchange="setSelectableList(this)" checked>R</label>
@@ -308,7 +320,7 @@
 		</div>
 		
 		<div id="filterStars">
-			<div class="toggleAll" onclick="toggleAllCheckboxes(this)"></div>
+			<button class="toggleAll" onclick="toggleAllCheckboxes(this)"></button>
 			<div class="chooseOption">
 				<label><input type="checkbox" value="0" onchange="setSelectableList(this)" checked>0★</label>
 				<label><input type="checkbox" value="1" onchange="setSelectableList(this)" checked>1★</label>
@@ -321,7 +333,7 @@
 		</div>
 		
 		<div id="filterElement" class="mo">
-			<div class="toggleAll" onclick="toggleAllCheckboxes(this)"></div>
+			<button class="toggleAll" onclick="toggleAllCheckboxes(this)"></button>
 			<div class="chooseOption">
 				<label><input type="checkbox" value="Fire" onchange="setSelectableList(this)" checked>火</label>
 				<label><input type="checkbox" value="Water" onchange="setSelectableList(this)" checked>水</label>
@@ -333,7 +345,7 @@
 		</div>
 		
 		<div id="filterWeaponType" class="wo" style="display: none;">
-			<div class="toggleAll" onclick="toggleAllCheckboxes(this)"></div>
+			<button class="toggleAll" onclick="toggleAllCheckboxes(this)"></button>
 			<div class="chooseOption" id="filterWeaponTypeYellow">
 				<label><input type="checkbox" value="Sword" onchange="setSelectableList(this)" checked>單手劍</label>
 				<label><input type="checkbox" value="Axe" onchange="setSelectableList(this)" checked>單手斧</label>
