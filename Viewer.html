@@ -48,7 +48,8 @@
 				left: -0.4em;
 				border: none;
 				background: transparent;
-				width: max(3%, 1em);;
+				width: max(3%, 1em);
+				;
 				height: 100%;
 				padding: 0;
 				font: inherit;
@@ -585,7 +586,7 @@
 			};
 			const wholeData = {};
 			
-			document.addEventListener("DOMContentLoaded", loadWholeData());
+			document.addEventListener("DOMContentLoaded", initPage());
 			
 			function changeCategory() {
 				unit_category = document.querySelector('input[name="unit_category"]:checked').value;
@@ -671,7 +672,16 @@
 				setSelectableList();
 			}
 			
+			function initPage() {
+				initFilter();
+				loadWholeData();
+				analyzeUrlParams();
+			}
 			
+			function initFilter() {
+				document.getElementById("selectCategory").querySelector('input[type="radio"]').checked = true;
+				document.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = true);
+			}
 			
 			async function loadWholeData() {
 				for (const [key, url] of Object.entries(dataUrls)) {
@@ -685,8 +695,6 @@
 					}
 				}
 				setSelectableList();
-				
-				analyzeUrlParams();
 			}
 			
 			function insertInfo(jsonData) {
