@@ -674,7 +674,7 @@
 			
 			function initPage() {
 				initFilter();
-				loadWholeData();
+				loadWholeData().then(setSelectableList);
 				analyzeUrlParams();
 			}
 			
@@ -694,7 +694,6 @@
 						console.error(`讀取或解析 ${key} 時發生錯誤:`, e);
 					}
 				}
-				setSelectableList();
 			}
 			
 			function insertInfo(jsonData) {
