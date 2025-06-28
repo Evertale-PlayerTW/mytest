@@ -304,6 +304,12 @@
 				line-height: 1;
 				transform: translate(-50%, -100%);
 			}
+
+			#selectableList {
+				display: grid;
+				grid-template-columns: 1fr auto;
+				align-items: center;
+			}
 		</style>
 	</head>
 
@@ -367,9 +373,12 @@
 			</div>
 		</div>
 
-		<select id="targetSelect" onchange="displayData()">
-			<option value="" disabled selected hidden>▼ 選擇目標 ▼</option>
-		</select>
+		<div id="selectableList">
+			<select id="targetSelect" onchange="displayData()">
+				<option value="" disabled selected hidden>▼ 選擇目標 ▼</option>
+			</select>
+			<label><input type="checkbox" id="reverseToggle" onchange="reverseOptions()" value="false" />反序</label>
+		</div>
 
 		<hr style="margin-top: 1em" />
 		<div id="nameDisplay">
@@ -578,6 +587,7 @@
 
 		<script>
 			let unit_category = "Monster";
+			let currentDisplayCategory;
 			const initSelectOptionContent = document.getElementById("targetSelect").innerHTML;
 			const initTitle = document.title;
 			const dataUrls = {
@@ -588,6 +598,21 @@
 			const wholeData = {};
 
 			document.addEventListener("DOMContentLoaded", initPage());
+
+			async function initPage() {
+				await initFilter();
+				await loadWholeData();
+				await setSelectableList();
+				await analyzeUrlParams();
+			}
+
+			/*=====篩選邏輯區塊=====*/
+
+			function initFilter() {
+				document.getElementById("selectCategory").querySelector('input[type="radio"]').checked = true;
+				document.querySelectorAll('input[type="checkbox"]').forEach((c) => (c.checked = true));
+				document.getElementById("reverseToggle").checked = false;
+			}
 
 			function changeCategory() {
 				unit_category = document.querySelector('input[name="unit_category"]:checked').value;
@@ -610,6 +635,7 @@
 				}
 
 				document.querySelectorAll('.chooseOption input[type="checkbox"]').forEach((el) => (el.checked = true));
+				document.getElementById("reverseToggle").checked = false;
 
 				setSelectableList();
 			}
@@ -643,9 +669,11 @@
 					if (!selectedStars.includes(String(entry["目前星數"]))) continue;
 
 					option.value = id;
-					option.text = getFullNameAddStarsOrRarity(id, true, false);
+					option.text = getFullNameAddStarsOrRarity(id, unit_category, true, false);
 					targetSelect.appendChild(option);
 				}
+
+				if (document.getElementById("reverseToggle").checked) reverseOptions();
 
 				if (filteredStars.size !== 0) {
 					//禁用沒有的星數選項
@@ -668,6 +696,14 @@
 				}
 			}
 
+			function reverseOptions() {
+				const selectableTarget = document.getElementById("targetSelect");
+				const originalOptions = Array.from(selectableTarget.options).slice(1);
+				const newOptions = originalOptions.reverse();
+				selectableTarget.innerHTML = initSelectOptionContent;
+				newOptions.forEach((option) => selectableTarget.appendChild(option));
+			}
+
 			function toggleAllCheckboxes(toggleElement) {
 				const checkboxes = toggleElement.parentElement.querySelectorAll('input[type="checkbox"]');
 
@@ -680,17 +716,7 @@
 				setSelectableList();
 			}
 
-			async function initPage() {
-				await initFilter();
-				await loadWholeData();
-				await setSelectableList();
-				await analyzeUrlParams();
-			}
-
-			function initFilter() {
-				document.getElementById("selectCategory").querySelector('input[type="radio"]').checked = true;
-				document.querySelectorAll('input[type="checkbox"]').forEach((c) => (c.checked = true));
-			}
+			/*=====載入資料區塊=====*/
 
 			async function loadWholeData() {
 				for (const [key, url] of Object.entries(dataUrls)) {
@@ -724,20 +750,22 @@
 				}
 			}
 
-			function displayData(id) {
-				if (!id) {
-					id = document.getElementById("targetSelect").value;
-				}
+			/*=====資訊顯示區塊=====*/
+
+			function displayData(id, myCategory) {
+				id ??= document.getElementById("targetSelect").value;
 				if (id == "") return;
 
+				currentDisplayCategory = myCategory ?? unit_category;
+
 				collapseReset();
-				document.title = `${wholeData[unit_category][id]["完整名"]} | ${initTitle}`;
+				document.title = `${wholeData[currentDisplayCategory][id]["完整名"]} | ${initTitle}`;
 
 				document.getElementById("codeName").textContent = id;
-				document.getElementById("bigName").textContent = wholeData[unit_category][id]["名字"] || id;
-				if (wholeData[unit_category][id]["副名"]) {
+				document.getElementById("bigName").textContent = wholeData[currentDisplayCategory][id]["名字"] || id;
+				if (wholeData[currentDisplayCategory][id]["副名"]) {
 					document.getElementById("subName").classList.remove("hidden");
-					document.getElementById("subName").textContent = wholeData[unit_category][id]["副名"];
+					document.getElementById("subName").textContent = wholeData[currentDisplayCategory][id]["副名"];
 				} else {
 					document.getElementById("subName").classList.add("hidden");
 				}
@@ -760,7 +788,7 @@
 			function setGeneralStats(id) {
 				document.getElementById("generalStatsArea").classList.remove("hidden");
 
-				if (unit_category === "Equipment") {
+				if (currentDisplayCategory === "Equipment") {
 					document.querySelector("#atk .infoTitle").textContent = "攻擊力";
 					document.querySelector("#hp .infoTitle").textContent = "生命";
 					document.getElementById("powerHint").classList.add("hidden");
@@ -770,82 +798,89 @@
 					document.getElementById("powerHint").classList.remove("hidden");
 				}
 
-				if (wholeData[unit_category][id]["稀有度"] != null) {
+				if (wholeData[currentDisplayCategory][id]["稀有度"] != null) {
 					document.getElementById("rarity").classList.remove("hidden");
-					document.querySelector("#rarity .infoValue").textContent = wholeData[unit_category][id]["稀有度"];
+					document.querySelector("#rarity .infoValue").textContent = wholeData[currentDisplayCategory][id]["稀有度"];
 				} else {
 					document.getElementById("rarity").classList.add("hidden");
 				}
 
-				if (wholeData[unit_category][id]["星數"] != null) {
+				if (wholeData[currentDisplayCategory][id]["星數"] != null) {
 					document.getElementById("stars").classList.remove("hidden");
-					document.querySelector("#stars .infoValue").textContent = wholeData[unit_category][id]["星數"];
+					document.querySelector("#stars .infoValue").textContent = wholeData[currentDisplayCategory][id]["星數"];
 				} else {
 					document.getElementById("stars").classList.add("hidden");
 				}
 
-				if (wholeData[unit_category][id]["擅長武器"] != null) {
+				if (wholeData[currentDisplayCategory][id]["擅長武器"] != null) {
 					document.getElementById("preferredWeapon").classList.remove("hidden");
-					document.querySelector("#preferredWeapon .infoValue").textContent = wholeData[unit_category][id]["擅長武器"];
+					document.querySelector("#preferredWeapon .infoValue").textContent =
+						wholeData[currentDisplayCategory][id]["擅長武器"];
 				} else {
 					document.getElementById("preferredWeapon").classList.add("hidden");
 				}
 
-				if (wholeData[unit_category][id]["類型"] != null) {
+				if (wholeData[currentDisplayCategory][id]["類型"] != null) {
 					document.getElementById("weaponType").classList.remove("hidden");
-					document.querySelector("#weaponType .infoValue").textContent = wholeData[unit_category][id]["類型"];
+					document.querySelector("#weaponType .infoValue").textContent = wholeData[currentDisplayCategory][id]["類型"];
 				} else {
 					document.getElementById("weaponType").classList.add("hidden");
 				}
 
-				if (wholeData[unit_category][id]["屬性"] != null) {
+				if (wholeData[currentDisplayCategory][id]["屬性"] != null) {
 					document.getElementById("element").classList.remove("hidden");
-					document.querySelector("#element .infoValue").textContent = wholeData[unit_category][id]["屬性"];
+					document.querySelector("#element .infoValue").textContent = wholeData[currentDisplayCategory][id]["屬性"];
 				} else {
 					document.getElementById("element").classList.add("hidden");
 				}
-				if (wholeData[unit_category][id]["Cost"] != null) {
+				if (wholeData[currentDisplayCategory][id]["Cost"] != null) {
 					document.getElementById("cost").classList.remove("hidden");
-					document.querySelector("#cost .infoValue").textContent = wholeData[unit_category][id]["Cost"];
+					document.querySelector("#cost .infoValue").textContent = wholeData[currentDisplayCategory][id]["Cost"];
 				} else {
 					document.getElementById("cost").classList.add("hidden");
 				}
 
-				if ((wholeData[unit_category][id]["基礎攻擊力"] != null) | (wholeData[unit_category][id]["攻擊力"] != null)) {
+				if (
+					(wholeData[currentDisplayCategory][id]["基礎攻擊力"] != null) |
+					(wholeData[currentDisplayCategory][id]["攻擊力"] != null)
+				) {
 					document.getElementById("atk").classList.remove("hidden");
 					document.querySelector("#atk .infoValue").textContent =
-						wholeData[unit_category][id]["基礎攻擊力"] ?? wholeData[unit_category][id]["攻擊力"];
+						wholeData[currentDisplayCategory][id]["基礎攻擊力"] ?? wholeData[currentDisplayCategory][id]["攻擊力"];
 				} else {
 					document.getElementById("atk").classList.add("hidden");
 				}
 
-				if ((wholeData[unit_category][id]["基礎生命"] != null) | (wholeData[unit_category][id]["生命"] != null)) {
+				if (
+					(wholeData[currentDisplayCategory][id]["基礎生命"] != null) |
+					(wholeData[currentDisplayCategory][id]["生命"] != null)
+				) {
 					document.getElementById("hp").classList.remove("hidden");
 					document.querySelector("#hp .infoValue").textContent =
-						wholeData[unit_category][id]["基礎生命"] ?? wholeData[unit_category][id]["生命"];
+						wholeData[currentDisplayCategory][id]["基礎生命"] ?? wholeData[currentDisplayCategory][id]["生命"];
 				} else {
 					document.getElementById("hp").classList.add("hidden");
 				}
 
-				if (wholeData[unit_category][id]["速度"] != null) {
+				if (wholeData[currentDisplayCategory][id]["速度"] != null) {
 					document.getElementById("speed").classList.remove("hidden");
-					document.querySelector("#speed .infoValue").textContent = wholeData[unit_category][id]["速度"];
+					document.querySelector("#speed .infoValue").textContent = wholeData[currentDisplayCategory][id]["速度"];
 				} else {
 					document.getElementById("speed").classList.add("hidden");
 				}
 
-				if (wholeData[unit_category][id]["戰力"] != null) {
+				if (wholeData[currentDisplayCategory][id]["戰力"] != null) {
 					document.getElementById("power").classList.remove("hidden");
-					document.querySelector("#power .infoValue").textContent = wholeData[unit_category][id]["戰力"];
+					document.querySelector("#power .infoValue").textContent = wholeData[currentDisplayCategory][id]["戰力"];
 				} else {
 					document.getElementById("power").classList.add("hidden");
 				}
 
-				if (wholeData[unit_category][id]["自動進化"] != null) {
+				if (wholeData[currentDisplayCategory][id]["自動進化"] != null) {
 					document.getElementById("freeEvo").classList.remove("hidden");
-					const evoLv = `Lv.${wholeData[unit_category][id]["自動進化"]["進化等級"]}`;
+					const evoLv = `Lv.${wholeData[currentDisplayCategory][id]["自動進化"]["進化等級"]}`;
 					const evoTarget = setNameAndLink(
-						wholeData[unit_category][id]["自動進化"]["進化目標"],
+						wholeData[currentDisplayCategory][id]["自動進化"]["進化目標"],
 						"Monster",
 						true,
 						false
@@ -855,7 +890,7 @@
 					document.getElementById("freeEvo").classList.add("hidden");
 				}
 
-				if (wholeData[unit_category][id]["圖鑑可見"]) {
+				if (wholeData[currentDisplayCategory][id]["圖鑑可見"]) {
 					document.getElementById("visible").classList.remove("hidden");
 					document.querySelector("#visible .infoValue").textContent = "✔";
 				} else {
@@ -865,15 +900,15 @@
 			}
 
 			function setProfile(id) {
-				if (wholeData[unit_category][id]["簡介"]) {
+				if (wholeData[currentDisplayCategory][id]["簡介"]) {
 					document.getElementById("profileArea").classList.remove("hidden");
-					document.getElementById("profileText").innerText = wholeData[unit_category][id]["簡介"];
+					document.getElementById("profileText").innerText = wholeData[currentDisplayCategory][id]["簡介"];
 
 					document.getElementById("hasAscended")?.remove();
-					if (wholeData[unit_category][id]["簡介_已超越(滿覺)"] != null) {
+					if (wholeData[currentDisplayCategory][id]["簡介_已超越(滿覺)"] != null) {
 						const templateHasAscended = document.getElementById("template-hasAscended").content.cloneNode(true);
 						templateHasAscended.getElementById("profileAscendedText").innerText =
-							wholeData[unit_category][id]["簡介_已超越(滿覺)"];
+							wholeData[currentDisplayCategory][id]["簡介_已超越(滿覺)"];
 						document.getElementById("profileContent").appendChild(templateHasAscended);
 					}
 				} else {
@@ -882,34 +917,35 @@
 			}
 
 			function setLeaderSkill(id) {
-				if (wholeData[unit_category][id]["隊長技能"]) {
+				if (wholeData[currentDisplayCategory][id]["隊長技能"]) {
 					document.getElementById("leaderSkillArea").classList.remove("hidden");
-					document.getElementById("leaderSkillName").innerText = wholeData[unit_category][id]["隊長技能"]["技能標題"];
+					document.getElementById("leaderSkillName").innerText =
+						wholeData[currentDisplayCategory][id]["隊長技能"]["技能標題"];
 					document.getElementById("leaderSkillDecription").innerText =
-						wholeData[unit_category][id]["隊長技能"]["技能敘述"];
+						wholeData[currentDisplayCategory][id]["隊長技能"]["技能敘述"];
 				} else {
 					document.getElementById("leaderSkillArea").classList.add("hidden");
 				}
 			}
 
 			function setWeaponSkill(id) {
-				if (wholeData[unit_category][id]["武器技能"]) {
+				if (wholeData[currentDisplayCategory][id]["武器技能"]) {
 					document.getElementById("weaponSkillArea").classList.remove("hidden");
 					document.getElementById("weaponSkillName").innerText =
-						wholeData[unit_category][id]["武器技能"][0]["技能標題"];
+						wholeData[currentDisplayCategory][id]["武器技能"][0]["技能標題"];
 					document.getElementById("weaponSkillDecription").innerText =
-						wholeData[unit_category][id]["武器技能"][0]["技能敘述"];
+						wholeData[currentDisplayCategory][id]["武器技能"][0]["技能敘述"];
 				} else {
 					document.getElementById("weaponSkillArea").classList.add("hidden");
 				}
 			}
 
 			function setActiveSkill(id) {
-				if (wholeData[unit_category][id]["主動技能"]) {
+				if (wholeData[currentDisplayCategory][id]["主動技能"]) {
 					document.getElementById("activeSkillArea").classList.remove("hidden");
 					document.getElementById("activeSkillContent").innerHTML = "";
 
-					for (const [index, mySkill] of wholeData[unit_category][id]["主動技能"].entries()) {
+					for (const [index, mySkill] of wholeData[currentDisplayCategory][id]["主動技能"].entries()) {
 						const templateActiveSkill = document.getElementById("template-activeSkill").content.cloneNode(true);
 						templateActiveSkill.querySelector(".activeSkillDetail").id = "activeSkill_" + (index + 1);
 						templateActiveSkill.querySelector(".activeSkillName").innerText = mySkill["技能標題"];
@@ -925,11 +961,11 @@
 			}
 
 			function setPassiveSkill(id) {
-				if (wholeData[unit_category][id]["被動技能"]) {
+				if (wholeData[currentDisplayCategory][id]["被動技能"]) {
 					document.getElementById("passiveSkillArea").classList.remove("hidden");
 					document.getElementById("passiveSkillContent").innerHTML = "";
 
-					for (const [index, mySkill] of wholeData[unit_category][id]["被動技能"].entries()) {
+					for (const [index, mySkill] of wholeData[currentDisplayCategory][id]["被動技能"].entries()) {
 						const templateActiveSkill = document.getElementById("template-passiveSkill").content.cloneNode(true);
 						templateActiveSkill.querySelector(".passiveSkillDetail").id = "passiveSkill_" + (index + 1);
 						templateActiveSkill.querySelector(".passiveSkillName").innerText = mySkill["技能標題"];
@@ -943,16 +979,16 @@
 			}
 
 			function setGachaIntro(id) {
-				if (wholeData[unit_category][id]["召喚導言"]) {
+				if (wholeData[currentDisplayCategory][id]["召喚導言"]) {
 					document.getElementById("gachaIntroArea").classList.remove("hidden");
-					document.getElementById("gachaIntroText").innerText = wholeData[unit_category][id]["召喚導言"];
+					document.getElementById("gachaIntroText").innerText = wholeData[currentDisplayCategory][id]["召喚導言"];
 				} else {
 					document.getElementById("gachaIntroArea").classList.add("hidden");
 				}
 			}
 
 			function setDialog(id) {
-				if (wholeData[unit_category][id]["對話"]) {
+				if (wholeData[currentDisplayCategory][id]["對話"]) {
 					document.getElementById("dialogArea").classList.remove("hidden");
 					document.getElementById("dialogContent").innerHTML = "";
 
@@ -964,13 +1000,13 @@
 					};
 
 					for (const [key, title] of Object.entries(dailogSort)) {
-						if (!wholeData[unit_category][id]["對話"][title]) continue;
+						if (!wholeData[currentDisplayCategory][id]["對話"][title]) continue;
 
 						const templateDialog = document.getElementById("template-dialog").content.cloneNode(true);
 						templateDialog.querySelector(".dialogGroup").id = "dialog_" + key;
 						templateDialog.querySelector(".dialogGroupTitle").innerText = title;
 
-						for (const dialogText of wholeData[unit_category][id]["對話"][title]) {
+						for (const dialogText of wholeData[currentDisplayCategory][id]["對話"][title]) {
 							if (!dialogText) continue;
 							const templateDialogText = templateDialog.querySelector(".dialogText").cloneNode(true);
 							templateDialogText.innerText = dialogText;
@@ -988,10 +1024,10 @@
 			}
 
 			function setAiLogic(id) {
-				if (wholeData[unit_category][id]["AI邏輯"]) {
+				if (wholeData[currentDisplayCategory][id]["AI邏輯"]) {
 					document.getElementById("aiLogicArea").classList.remove("hidden");
 					//刪除最外層的{}，並統一減少1縮排
-					let jsonText = JSON.stringify(wholeData[unit_category][id]["AI邏輯"], null, "\t");
+					let jsonText = JSON.stringify(wholeData[currentDisplayCategory][id]["AI邏輯"], null, "\t");
 					jsonText = jsonText.split("\n").slice(1, -1);
 					jsonText = jsonText.map((line) => line.replace(/^\t/, ""));
 					jsonText = jsonText.join("\n");
@@ -1002,10 +1038,10 @@
 				}
 			}
 
-			function getFullNameAddStarsOrRarity(id, addStars = true, addRarity = false) {
-				let longName = wholeData[unit_category][id]["完整名"];
-				if (addStars) longName += ` (${wholeData[unit_category][id]["星數"]})`;
-				if (addRarity) longName += ` (${wholeData[unit_category][id]["稀有度"]})`;
+			function getFullNameAddStarsOrRarity(id, category, addStars = true, addRarity = false) {
+				let longName = wholeData[category][id]["完整名"];
+				if (addStars) longName += ` (${wholeData[category][id]["星數"]})`;
+				if (addRarity) longName += ` (${wholeData[category][id]["稀有度"]})`;
 				return longName;
 			}
 
@@ -1031,9 +1067,7 @@
 						})();
 
 					if (wholeData[category][id]) {
-						unit_category = category;
-						displayData(id);
-						unit_category = document.querySelector('input[name="unit_category"]:checked').value;
+						displayData(id, category);
 						history.replaceState(null, "", window.location.pathname);
 					} else {
 						throw new Error("id或category參數錯誤");
@@ -1047,14 +1081,14 @@
 			function setNameAndLink(id, category, addStars = true, addRarity = false) {
 				const linkElement = document.createElement("a");
 				linkElement.href = `?id=${id}&category=${category}`;
-				linkElement.textContent = getFullNameAddStarsOrRarity(id, addStars, addRarity);
+				linkElement.textContent = getFullNameAddStarsOrRarity(id, category, addStars, addRarity);
 				return linkElement;
 			}
 
 			function setSummonableMonsters(id) {
-				if (wholeData[unit_category][id]["召喚物"]) {
+				if (wholeData[currentDisplayCategory][id]["召喚物"]) {
 					document.getElementById("summonableMonstersArea").classList.remove("hidden");
-					const combination = wholeData[unit_category][id]["召喚物"]
+					const combination = wholeData[currentDisplayCategory][id]["召喚物"]
 						.map((conjureID) => setNameAndLink(conjureID, "Monster", true, false).outerHTML)
 						.join("<br>");
 					document.getElementById("summonableMonstersContent").innerHTML = combination;
@@ -1064,11 +1098,11 @@
 			}
 
 			function setRelationship(id) {
-				if (wholeData[unit_category][id]["夥伴"]) {
+				if (wholeData[currentDisplayCategory][id]["夥伴"]) {
 					document.getElementById("relationshipArea").classList.remove("hidden");
 					document.getElementById("relationshipContent").innerHTML = "";
 
-					for (const oneRelationship of Object.values(wholeData[unit_category][id]["夥伴"])) {
+					for (const oneRelationship of Object.values(wholeData[currentDisplayCategory][id]["夥伴"])) {
 						const templateRelationship = document.getElementById("template-relationship").content.cloneNode(true);
 						templateRelationship.querySelector(".relationshipName").innerText = oneRelationship["夥伴關係"];
 						templateRelationship.querySelector(".relationshipBonus").innerText = oneRelationship["夥伴加成"].replace(
