@@ -674,6 +674,7 @@
 				}
 
 				if (document.getElementById("reverseToggle").checked) reverseOptions();
+				targetSelect.selectedIndex = 0;
 
 				if (filteredStars.size !== 0) {
 					//禁用沒有的星數選項
@@ -702,6 +703,7 @@
 				const newOptions = originalOptions.reverse();
 				selectableTarget.innerHTML = initSelectOptionContent;
 				newOptions.forEach((option) => selectableTarget.appendChild(option));
+				selectableTarget.selectedIndex = 0;
 			}
 
 			function toggleAllCheckboxes(toggleElement) {
