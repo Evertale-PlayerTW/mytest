@@ -91,13 +91,9 @@
 			}
 
 			select {
-				/* 隱藏 <select> 預設的箭頭樣式 */
 				appearance: none;
-				/* For modern browsers */
 				-webkit-appearance: none;
-				/* For Safari and Chrome */
 				-moz-appearance: none;
-				/* For Firefox */
 				text-align: center;
 				text-align-last: center;
 				-moz-text-align-last: center;
@@ -305,6 +301,14 @@
 				transform: translate(-50%, -100%);
 			}
 
+			#dataProgress {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				text-align: center;
+			}
+
 			#selectableList {
 				display: grid;
 				grid-template-columns: 1fr auto;
@@ -314,72 +318,82 @@
 	</head>
 
 	<body>
-		<div class="chooseOption" id="selectCategory">
-			<label><input type="radio" name="unit_category" value="Monster" onchange="changeCategory()" checked />角色</label>
-			<label><input type="radio" name="unit_category" value="Weapon" onchange="changeCategory()" />武器</label>
-			<label><input type="radio" name="unit_category" value="Equipment" onchange="changeCategory()" />飾品</label>
+		<div id="dataProgress">
+			<div id="loadingReminder">載入速度取決於網路品質及伺服器連線<br />請耐心等候</div>
+			<div id="languageProgress"></div>
+			<div id="monsterProgress"></div>
+			<div id="weaponProgress"></div>
+			<div id="equipmentProgress"></div>
 		</div>
-
-		<div id="filterRarity">
-			<button class="toggleAll" onclick="toggleAllCheckboxes(this)"></button>
-			<div class="chooseOption">
-				<label><input type="checkbox" value="N" onchange="setSelectableList(this)" checked />N</label>
-				<label><input type="checkbox" value="R" onchange="setSelectableList(this)" checked />R</label>
-				<label><input type="checkbox" value="SR" onchange="setSelectableList(this)" checked />SR</label>
-				<label><input type="checkbox" value="SSR" onchange="setSelectableList(this)" checked />SSR</label>
-			</div>
-		</div>
-
-		<div id="filterStars">
-			<button class="toggleAll" onclick="toggleAllCheckboxes(this)"></button>
-			<div class="chooseOption">
-				<label><input type="checkbox" value="0" onchange="setSelectableList(this)" checked />0★</label>
-				<label><input type="checkbox" value="1" onchange="setSelectableList(this)" checked />1★</label>
-				<label><input type="checkbox" value="2" onchange="setSelectableList(this)" checked />2★</label>
-				<label><input type="checkbox" value="3" onchange="setSelectableList(this)" checked />3★</label>
-				<label><input type="checkbox" value="4" onchange="setSelectableList(this)" checked />4★</label>
-				<label><input type="checkbox" value="5" onchange="setSelectableList(this)" checked />5★</label>
-				<label><input type="checkbox" value="6" onchange="setSelectableList(this)" checked />6★</label>
-			</div>
-		</div>
-
-		<div id="filterElement" class="mo">
-			<button class="toggleAll" onclick="toggleAllCheckboxes(this)"></button>
-			<div class="chooseOption">
-				<label><input type="checkbox" value="Fire" onchange="setSelectableList(this)" checked />火</label>
-				<label><input type="checkbox" value="Water" onchange="setSelectableList(this)" checked />水</label>
-				<label><input type="checkbox" value="Earth" onchange="setSelectableList(this)" checked />地</label>
-				<label><input type="checkbox" value="Air" onchange="setSelectableList(this)" checked />雷</label>
-				<label><input type="checkbox" value="Life" onchange="setSelectableList(this)" checked />光</label>
-				<label><input type="checkbox" value="Death" onchange="setSelectableList(this)" checked />闇</label>
-			</div>
-		</div>
-
-		<div id="filterWeaponType" class="wo" style="display: none">
-			<button class="toggleAll" onclick="toggleAllCheckboxes(this)"></button>
-			<div class="chooseOption" id="filterWeaponTypeYellow">
-				<label><input type="checkbox" value="Sword" onchange="setSelectableList(this)" checked />單手劍</label>
-				<label><input type="checkbox" value="Axe" onchange="setSelectableList(this)" checked />單手斧</label>
-				<label><input type="checkbox" value="Staff" onchange="setSelectableList(this)" checked />法杖</label>
-				<label><input type="checkbox" value="Mace" onchange="setSelectableList(this)" checked />釘頭鎚</label>
+		<div class="hidden" id="filterArea">
+			<div class="chooseOption" id="selectCategory">
+				<label
+					><input type="radio" name="unit_category" value="Monster" onchange="changeCategory()" checked />角色</label
+				>
+				<label><input type="radio" name="unit_category" value="Weapon" onchange="changeCategory()" />武器</label>
+				<label><input type="radio" name="unit_category" value="Equipment" onchange="changeCategory()" />飾品</label>
 			</div>
 
-			<div class="chooseOption" id="filterWeaponTypeRed">
-				<label><input type="checkbox" value="GreatSword" onchange="setSelectableList(this)" checked />雙手劍</label>
-				<label><input type="checkbox" value="GreatAxe" onchange="setSelectableList(this)" checked />雙手斧</label>
-				<label><input type="checkbox" value="Spear" onchange="setSelectableList(this)" checked />長槍</label>
-				<label><input type="checkbox" value="Hammer" onchange="setSelectableList(this)" checked />大槌</label>
-				<label><input type="checkbox" value="Katana" onchange="setSelectableList(this)" checked />武士刀</label>
+			<div id="filterRarity">
+				<button class="toggleAll" onclick="toggleAllCheckboxes(this)"></button>
+				<div class="chooseOption">
+					<label><input type="checkbox" value="N" onchange="setSelectableList(this)" checked />N</label>
+					<label><input type="checkbox" value="R" onchange="setSelectableList(this)" checked />R</label>
+					<label><input type="checkbox" value="SR" onchange="setSelectableList(this)" checked />SR</label>
+					<label><input type="checkbox" value="SSR" onchange="setSelectableList(this)" checked />SSR</label>
+				</div>
+			</div>
+
+			<div id="filterStars">
+				<button class="toggleAll" onclick="toggleAllCheckboxes(this)"></button>
+				<div class="chooseOption">
+					<label><input type="checkbox" value="0" onchange="setSelectableList(this)" checked />0★</label>
+					<label><input type="checkbox" value="1" onchange="setSelectableList(this)" checked />1★</label>
+					<label><input type="checkbox" value="2" onchange="setSelectableList(this)" checked />2★</label>
+					<label><input type="checkbox" value="3" onchange="setSelectableList(this)" checked />3★</label>
+					<label><input type="checkbox" value="4" onchange="setSelectableList(this)" checked />4★</label>
+					<label><input type="checkbox" value="5" onchange="setSelectableList(this)" checked />5★</label>
+					<label><input type="checkbox" value="6" onchange="setSelectableList(this)" checked />6★</label>
+				</div>
+			</div>
+
+			<div id="filterElement" class="mo">
+				<button class="toggleAll" onclick="toggleAllCheckboxes(this)"></button>
+				<div class="chooseOption">
+					<label><input type="checkbox" value="Fire" onchange="setSelectableList(this)" checked />火</label>
+					<label><input type="checkbox" value="Water" onchange="setSelectableList(this)" checked />水</label>
+					<label><input type="checkbox" value="Earth" onchange="setSelectableList(this)" checked />地</label>
+					<label><input type="checkbox" value="Air" onchange="setSelectableList(this)" checked />雷</label>
+					<label><input type="checkbox" value="Life" onchange="setSelectableList(this)" checked />光</label>
+					<label><input type="checkbox" value="Death" onchange="setSelectableList(this)" checked />闇</label>
+				</div>
+			</div>
+
+			<div id="filterWeaponType" class="wo" style="display: none">
+				<button class="toggleAll" onclick="toggleAllCheckboxes(this)"></button>
+				<div class="chooseOption" id="filterWeaponTypeYellow">
+					<label><input type="checkbox" value="Sword" onchange="setSelectableList(this)" checked />單手劍</label>
+					<label><input type="checkbox" value="Axe" onchange="setSelectableList(this)" checked />單手斧</label>
+					<label><input type="checkbox" value="Staff" onchange="setSelectableList(this)" checked />法杖</label>
+					<label><input type="checkbox" value="Mace" onchange="setSelectableList(this)" checked />釘頭鎚</label>
+				</div>
+
+				<div class="chooseOption" id="filterWeaponTypeRed">
+					<label><input type="checkbox" value="GreatSword" onchange="setSelectableList(this)" checked />雙手劍</label>
+					<label><input type="checkbox" value="GreatAxe" onchange="setSelectableList(this)" checked />雙手斧</label>
+					<label><input type="checkbox" value="Spear" onchange="setSelectableList(this)" checked />長槍</label>
+					<label><input type="checkbox" value="Hammer" onchange="setSelectableList(this)" checked />大槌</label>
+					<label><input type="checkbox" value="Katana" onchange="setSelectableList(this)" checked />武士刀</label>
+				</div>
+			</div>
+
+			<div id="selectableList">
+				<select id="targetSelect" onchange="displayData()">
+					<option value="" disabled selected hidden>▼ 選擇目標 ▼</option>
+				</select>
+				<label><input type="checkbox" id="reverseToggle" onchange="reverseOptions()" value="false" />反序</label>
 			</div>
 		</div>
-
-		<div id="selectableList">
-			<select id="targetSelect" onchange="displayData()">
-				<option value="" disabled selected hidden>▼ 選擇目標 ▼</option>
-			</select>
-			<label><input type="checkbox" id="reverseToggle" onchange="reverseOptions()" value="false" />反序</label>
-		</div>
-
 		<hr style="margin-top: 1em" />
 		<div id="nameDisplay">
 			<div id="subName"></div>
@@ -586,11 +600,12 @@
 		</template>
 
 		<script src="JavaScript\FilterLogic.js"></script>
+		<script src="JavaScript\LoadData.js"></script>
 		<script src="JavaScript\InfoDisplay.js"></script>
 		<script>
 			let unit_category = document.querySelector('input[name="unit_category"]:checked').value;
 			let currentDisplayCategory = null;
-			const wholeData = {};
+			let wholeData = {};
 
 			document.addEventListener("DOMContentLoaded", initPage());
 
@@ -599,45 +614,6 @@
 				await loadWholeData();
 				await setSelectableList();
 				await analyzeUrlParams();
-			}
-
-			/*=====載入資料區塊=====*/
-			const dataUrls = {
-				Monster: "https://evertale-playertw.github.io/Collection/Cht/Monster.json",
-				Weapon: "https://evertale-playertw.github.io/Collection/Cht/Weapon.json",
-				Equipment: "https://evertale-playertw.github.io/Collection/Cht/Accessory.json",
-			};
-
-			async function loadWholeData() {
-				for (const [key, url] of Object.entries(dataUrls)) {
-					try {
-						const rawText = await fetch(url).then((res) => res.text());
-						const jsonData = JSON.parse(rawText.replace(/\\(?![\\\/bfnrtu"])/g, "\\\\"));
-						insertInfo(jsonData);
-						wholeData[key] = jsonData;
-					} catch (e) {
-						console.error(`讀取或解析 ${key} 時發生錯誤:`, e);
-					}
-				}
-			}
-
-			function insertInfo(jsonData) {
-				for (const id in jsonData) {
-					let fullName = jsonData[id]["名字"] || id;
-
-					if (jsonData[id]["副名"]) {
-						fullName += ` - ${jsonData[id]["副名"]}`;
-					}
-					jsonData[id]["完整名"] = fullName;
-
-					if (jsonData[id]["星數"]) {
-						jsonData[id]["目前星數"] = jsonData[id]["星數"].split("★").length - 1;
-						jsonData[id]["最大星數"] = jsonData[id]["星數"].length;
-					} else {
-						jsonData[id]["目前星數"] = 0;
-						jsonData[id]["最大星數"] = 0;
-					}
-				}
 			}
 		</script>
 	</body>
