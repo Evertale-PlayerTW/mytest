@@ -834,7 +834,6 @@
 			try {
 				for (const [langKey, filelink] of Object.entries(langLink)) {
 					const data = {};
-					alert(`${proxyUrl}${filelink}`);
 					const responseText = await (await fetch(`${proxyUrl}${filelink}`)).text();
 					const lines = responseText.split(/\r?\n/);
 
