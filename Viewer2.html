@@ -834,7 +834,7 @@
 			try {
 				for (const [langKey, filelink] of Object.entries(langLink)) {
 					const data = {};
-					const responseText = await (await fetch(`${proxyUrl}${filelink}`)).text();
+					const responseText = await (await fetchCheck(`${proxyUrl}${filelink}`)).text();
 					const lines = responseText.split(/\r?\n/);
 
 					for (let line of lines) {
@@ -856,6 +856,17 @@
 			console.timeEnd("Lang");
 		}
 
+		async function fetchCheck(url) {
+			const response = await fetch(url);
+			if (!response.ok) {
+				const text = await response.text();
+				alert(`HTTP Error ${response.status}: ${response.statusText}\n${text}`);
+				throw new Error(`HTTP ${response.status}`);
+			}
+			return response;
+		}
+
+
 		function getTextByKey(textKey) {
 			for (const langKey in langData) {
 				if (langData[langKey][textKey]) {
@@ -876,7 +887,7 @@
 			document.getElementById("equipmentProgress").textContent = "載入中...";
 			try {
 				const baseEquipmentConfigUrl = `${resourceUrlPrefix}Equipment.json`;
-				const baseEquipmentConfig = await fetch(`${proxyUrl}${baseEquipmentConfigUrl}`)
+				const baseEquipmentConfig = await fetchCheck(`${proxyUrl}${baseEquipmentConfigUrl}`)
 					.then((res) => res.json())
 					.then((data) => data["Equipment"]);
 
@@ -923,7 +934,7 @@
 			document.getElementById("weaponProgress").textContent = "載入中...";
 			try {
 				const baseWeaponConfigUrl = `${resourceUrlPrefix}Weapon.json`;
-				const baseWeaponConfig = await fetch(`${proxyUrl}${baseWeaponConfigUrl}`)
+				const baseWeaponConfig = await fetchCheck(`${proxyUrl}${baseWeaponConfigUrl}`)
 					.then((res) => res.json())
 					.then((data) => data["Weapon"]);
 
@@ -986,14 +997,14 @@
 			try {
 				//載入基礎設定
 				const baseMonsterConfigUrl = `${resourceUrlPrefix}Monster.json`;
-				const baseMonsterConfig = await fetch(`${proxyUrl}${baseMonsterConfigUrl}`)
+				const baseMonsterConfig = await fetchCheck(`${proxyUrl}${baseMonsterConfigUrl}`)
 					.then((res) => res.json())
 					.then((data) => data["Monster"]);
 
 				//載入技能設定
 				const abilityDataConfigUrl = `${resourceUrlPrefix}Ability.json`;
 				const abilityDataConfig = {};
-				await fetch(`${proxyUrl}${abilityDataConfigUrl}`)
+				await fetchCheck(`${proxyUrl}${abilityDataConfigUrl}`)
 					.then((res) => res.json())
 					.then((data) => {
 						for (const ability of data["Ability"]) {
@@ -1004,7 +1015,7 @@
 				//載入AI威脅度設定
 				const aiThreatConfigUrl = `${resourceUrlPrefix}AIThreat.json`;
 				const aiThreatConfig = {};
-				await fetch(`${proxyUrl}${aiThreatConfigUrl}`)
+				await fetchCheck(`${proxyUrl}${aiThreatConfigUrl}`)
 					.then((res) => res.json())
 					.then((data) => {
 						for (const aiThreat of data["AIThreat"]) {
@@ -1016,7 +1027,7 @@
 
 				//載入技能AI設定
 				const skillAIConfigUrl = `${resourceUrlPrefix}AbilityAI.json`;
-				const skillAIConfig = await fetch(`${proxyUrl}${skillAIConfigUrl}`)
+				const skillAIConfig = await fetchCheck(`${proxyUrl}${skillAIConfigUrl}`)
 					.then((res) => res.json())
 					.then((data) => data["AbilityAI"]);
 
@@ -1178,7 +1189,7 @@
 			} catch (e) {
 				console.log("未能成功獲取夥伴關係", e);
 				const relationshipDataUrl = "https://evertale-playertw.github.io/Config/Relationship.json";
-				relationshipData = await fetch(relationshipDataUrl).then((res) => res.json());
+				relationshipData = await fetchCheck(relationshipDataUrl).then((res) => res.json());
 			}
 
 			for (const [relationID, relationDetail] of Object.entries(relationshipData)) {
@@ -1204,7 +1215,7 @@
 			const userDevice = "Google Pixel 6";
 			const userOs = "Android OS 13";
 			const evtVersion = (
-				await fetch(`${proxyUrl}${resourceUrlPrefix}Android/hashes.json`).then((res) => res.json())
+				await fetchCheck(`${proxyUrl}${resourceUrlPrefix}Android/hashes.json`).then((res) => res.json())
 			)["ver"];
 			const uuid = crypto.randomUUID();
 
@@ -1229,7 +1240,7 @@
 					requnique: "1",
 				};
 				const finalUrl_NewUser = `${proxyUrl}${baseUrl_NewUser}?${new URLSearchParams(params_NewUser).toString()}`;
-				const newuserResponse = await fetch(finalUrl_NewUser).then((res) => res.json());
+				const newuserResponse = await fetchCheck(finalUrl_NewUser).then((res) => res.json());
 				localStorage.setItem("NewAcc", JSON.stringify(newuserResponse["newuser"]));
 				uid = newuserResponse["newuser"]["uid"];
 				clid = newuserResponse["newuser"]["clid"];
@@ -1255,7 +1266,7 @@
 				requnique: "1",
 			};
 			const finalUrl_Login = `${proxyUrl}${baseUrl_Login}?${new URLSearchParams(params_Login).toString()}`;
-			const loginResponse = await fetch(finalUrl_Login).then((res) => res.json());
+			const loginResponse = await fetchCheck(finalUrl_Login).then((res) => res.json());
 			const sesid = loginResponse["login"]["sesid"];
 
 			//請求獲取Relationship資訊
@@ -1272,7 +1283,7 @@
 			const finalUrl_Relationship = `${proxyUrl}${baseUrl_Relationship}?${new URLSearchParams(
 				params_Relationship
 			).toString()}`;
-			const relationshipResponse = await fetch(finalUrl_Relationship).then((res) => res.json());
+			const relationshipResponse = await fetchCheck(finalUrl_Relationship).then((res) => res.json());
 
 			return relationshipResponse;
 		}
